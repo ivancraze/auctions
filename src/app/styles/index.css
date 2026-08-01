@@ -135,6 +135,10 @@ a {
 .filters-panel {
   position: sticky;
   top: 20px;
+  display: grid;
+  max-height: var(--filters-panel-max-height, calc(100dvh - 40px));
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
   padding: 20px;
   border: 1px solid #dfe4ec;
   border-radius: 18px;
@@ -162,7 +166,18 @@ a {
 
 .filters-form {
   display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.filters-form__fields {
+  display: grid;
+  min-height: 0;
+  overflow-y: auto;
   gap: 14px;
+  padding-right: 8px;
+  scrollbar-color: #c5cedb transparent;
+  scrollbar-width: thin;
 }
 
 .form-field {
@@ -202,7 +217,11 @@ a {
 .filters-form__actions {
   display: grid;
   gap: 8px;
-  margin-top: 6px;
+  margin: 16px -20px -20px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #e6eaf0;
+  background: #ffffff;
+  box-shadow: 0 -10px 24px rgb(23 32 51 / 5%);
 }
 
 .auction-card {
@@ -920,12 +939,17 @@ a.auction-card__route:hover {
     right: 0;
     bottom: 0;
     width: min(360px, 92vw);
-    overflow-y: auto;
+    max-height: none;
+    overflow: hidden;
     border: 0;
     border-radius: 18px 0 0 18px;
     box-shadow: -12px 0 36px rgb(16 24 40 / 18%);
     transform: translateX(105%);
     transition: transform 180ms ease;
+  }
+
+  .filters-form__actions {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
 
   .filters-panel--open {

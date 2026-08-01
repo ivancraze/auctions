@@ -5,7 +5,7 @@ export function RootLayout() {
     <div className="app-shell">
       <header className="app-header">
         <Link className="app-logo" search={{ page: 1 }} to="/auctions">
-          Cargo Auctions
+          Умная Логистика
         </Link>
       </header>
       <main className="app-main">
