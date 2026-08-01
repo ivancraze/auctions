@@ -20,6 +20,12 @@ export default defineConfig({
       include: ['src/**/*.{ts,tsx}'],
       provider: 'v8',
       reporter: ['text', 'html'],
+      thresholds: {
+        branches: 75,
+        functions: 90,
+        lines: 90,
+        statements: 90,
+      },
     },
     environment: 'jsdom',
     execArgv: ['--no-experimental-webstorage'],
