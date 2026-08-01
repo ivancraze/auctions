@@ -4,4 +4,4 @@ coverage
 .DS_Store
 *.local
 *.pdf
-/.idea/*
+.idea
