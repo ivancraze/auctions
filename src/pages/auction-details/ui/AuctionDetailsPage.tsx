@@ -138,8 +138,16 @@ export function AuctionDetailsPage() {
           <h2>Торги</h2>
           <dl className={styles.detailsList}>
             <div>
-              <dt>Ваш статус</dt>
+              <dt>
+                <b>Ваш статус</b>
+              </dt>
               <dd>{auction.userStatus}</dd>
+            </div>
+            <div>
+              <dt>
+                <b>Ваша ставка</b>
+              </dt>
+              <dd>{auction.trading.ownBet}</dd>
             </div>
             <div>
               <dt>Начало</dt>
@@ -174,10 +182,6 @@ export function AuctionDetailsPage() {
             <div>
               <dt>Цена за км</dt>
               <dd>{auction.trading.pricePerKm}</dd>
-            </div>
-            <div>
-              <dt>Ваша ставка</dt>
-              <dd>{auction.trading.ownBet}</dd>
             </div>
           </dl>
         </section>
