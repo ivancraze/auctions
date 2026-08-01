@@ -12,6 +12,7 @@ afterEach(() => {
 })
 
 describe('GlobalErrorBoundary', () => {
+  /** Проверяет безопасный fallback при необработанной ошибке React-дерева. */
   it('renders a safe fallback for an unhandled React error', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
 

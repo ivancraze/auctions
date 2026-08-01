@@ -1,9 +1,8 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { AppProviders } from '@/app/providers/AppProviders'
-import { queryClient } from '@/app/providers/queryClient'
-import { router } from '@/app/router/router'
+import { AppProviders, queryClient } from '@/app/providers'
+import { router } from '@/app/router'
 
 beforeEach(async () => {
   queryClient.clear()
@@ -34,5 +33,21 @@ describe('RootLayout', () => {
       expect(screen.getByText('Открыта страница: Аукцион')).toBeInTheDocument()
       expect(screen.getByRole('main')).toHaveFocus()
     })
+  })
+
+  /** Проверяет доступный fallback и возврат к списку для неизвестного URL. */
+  it('renders the not-found page for an unknown route', async () => {
+    render(<AppProviders />)
+
+    await act(async () => {
+      await router.navigate({ href: '/unknown-route' })
+    })
+
+    expect(
+      await screen.findByRole('heading', { name: 'Страница не найдена' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Вернуться к аукционам' }),
+    ).toHaveAttribute('href', '/auctions?page=1')
   })
 })

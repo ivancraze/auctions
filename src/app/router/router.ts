@@ -16,7 +16,6 @@ import { NotFoundPage } from '@/pages/not-found'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
-  notFoundComponent: NotFoundPage,
 })
 
 const indexRoute = createRoute({
@@ -65,12 +64,19 @@ const auctionBetRoute = createRoute({
   component: AuctionBetPage,
 })
 
+const notFoundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '$',
+  component: NotFoundPage,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   auctionsRoute,
   auctionDetailsRoute,
   auctionBetsRoute,
   auctionBetRoute,
+  notFoundRoute,
 ])
 
 export const router = createRouter({
