@@ -8,6 +8,7 @@ export function AuctionDetailsSkeleton() {
       className={styles.grid}
       aria-busy="true"
       aria-label="Загрузка аукциона"
+      role="status"
     >
       {Array.from({ length: 4 }, (_, index) => (
         <div className={styles.section} key={index}>

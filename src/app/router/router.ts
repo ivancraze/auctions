@@ -12,10 +12,11 @@ import { AuctionBetPage } from '@/pages/auction-bet/ui/AuctionBetPage'
 import { AuctionBetsPage } from '@/pages/auction-bets/ui/AuctionBetsPage'
 import { AuctionDetailsPage } from '@/pages/auction-details/ui/AuctionDetailsPage'
 import { AuctionsListPage } from '@/pages/auctions-list/ui/AuctionsListPage'
+import { NotFoundPage } from '@/pages/not-found/ui/NotFoundPage'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
-  notFoundComponent: () => 'Страница не найдена',
+  notFoundComponent: NotFoundPage,
 })
 
 const indexRoute = createRoute({

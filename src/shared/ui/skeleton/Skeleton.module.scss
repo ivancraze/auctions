@@ -21,3 +21,9 @@
     background-position-x: -200%;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

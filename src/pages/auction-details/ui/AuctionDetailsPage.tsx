@@ -54,8 +54,8 @@ export function AuctionDetailsPage() {
         >
           Аукционы
         </Link>
-        <span>→</span>
-        <span>Заявка № {auction.cargoNumber}</span>
+        <span aria-hidden="true">→</span>
+        <span aria-current="page">Заявка № {auction.cargoNumber}</span>
       </Breadcrumbs>
 
       <header className={styles.hero}>
@@ -116,7 +116,7 @@ export function AuctionDetailsPage() {
           <ol className={styles.timeline}>
             {auction.routes.map((route) => (
               <li key={route.key}>
-                <span className={styles.timelineMarker} />
+                <span aria-hidden="true" className={styles.timelineMarker} />
                 <div>
                   <FieldText variant="label">{route.operation}</FieldText>
                   <h3>{route.city}</h3>

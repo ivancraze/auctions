@@ -21,6 +21,23 @@
   border: 1px solid #dfe4ec;
   border-radius: 16px;
   background: #ffffff;
+
+  &:focus-visible {
+    outline: 3px solid rgb(23 105 224 / 45%);
+    outline-offset: 3px;
+  }
+}
+
+.caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .table {
@@ -48,7 +65,7 @@
     gap: 3px;
 
     span {
-      color: #768094;
+      color: #626d80;
       font-size: 0.75rem;
     }
   }
@@ -59,7 +76,20 @@
 }
 
 .canceled {
-  color: #8a93a2;
-  text-decoration: line-through;
+  color: #626d80;
   background: #fafafa;
+
+  > td:not(:last-child) {
+    text-decoration: line-through;
+  }
+}
+
+.canceledStatus {
+  display: grid;
+  gap: 2px;
+
+  small {
+    max-width: 260px;
+    white-space: normal;
+  }
 }

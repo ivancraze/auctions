@@ -28,6 +28,50 @@ describe('auction detail and bets pages', () => {
     expect(screen.getByRole('heading', { name: 'Маршрут' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Торги' })).toBeInTheDocument()
     expect(screen.getByText('ООО Логистика')).toBeInTheDocument()
+
+    const breadcrumbs = screen.getByRole('navigation', {
+      name: 'Навигационная цепочка',
+    })
+    expect(
+      within(breadcrumbs).getByText('Заявка № 00000001001'),
+    ).toHaveAttribute('aria-current', 'page')
+    within(breadcrumbs)
+      .getAllByText('→')
+      .forEach((separator) =>
+        expect(separator).toHaveAttribute('aria-hidden', 'true'),
+      )
+  })
+
+  /** Проверяет доступное live-состояние во время загрузки истории ставок. */
+  it('announces the bets loading state', async () => {
+    const auctionUuid = '550e8400-e29b-41d4-a716-446655440002'
+    let releaseResponse: () => void = () => undefined
+    const responseGate = new Promise<void>((resolve) => {
+      releaseResponse = resolve
+    })
+    server.use(
+      http.get('/api/v1/auctions/:auctionUuid', async () => {
+        await responseGate
+        return HttpResponse.json(mockStore.details[auctionUuid])
+      }),
+    )
+    await router.navigate({
+      to: '/auctions/$auctionUuid/bets',
+      params: { auctionUuid },
+      search: { page: 1 },
+    })
+    render(<AppProviders />)
+
+    expect(
+      (await screen.findByText('Загрузка истории ставок…')).closest(
+        '[role="status"]',
+      ),
+    ).toHaveAttribute('aria-busy', 'true')
+
+    releaseResponse()
+    expect(
+      await screen.findByRole('heading', { name: 'История ставок' }),
+    ).toBeInTheDocument()
   })
 
   /** Проверяет отдельное состояние страницы для скрытой истории ставок. */
@@ -126,7 +170,9 @@ describe('auction detail and bets pages', () => {
     })
     render(<AppProviders />)
 
-    expect(await screen.findByText('История ставок')).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'История ставок' }),
+    ).toBeInTheDocument()
     expect(screen.queryByText('Отменена')).not.toBeInTheDocument()
 
     fireEvent.click(
@@ -134,5 +180,22 @@ describe('auction detail and bets pages', () => {
     )
 
     expect(await screen.findByText('Отменена')).toBeInTheDocument()
+    expect(
+      screen.getByText('Причина: Ставка отозвана перевозчиком'),
+    ).toBeInTheDocument()
+
+    const tableRegion = screen.getByRole('region', {
+      name: 'Таблица истории ставок',
+    })
+    expect(tableRegion).toHaveAttribute('tabindex', '0')
+    tableRegion.focus()
+    expect(tableRegion).toHaveFocus()
+
+    const table = within(tableRegion).getByRole('table', {
+      name: /История ставок по заявке №/,
+    })
+    within(table)
+      .getAllByRole('columnheader')
+      .forEach((header) => expect(header).toHaveAttribute('scope', 'col'))
   })
 })

@@ -13,6 +13,7 @@ export function Skeleton({ className, variant, ...props }: SkeletonProps) {
     <span
       className={`${styles.skeleton} ${variant ? styles[variant] : ''} ${className ?? ''}`}
       {...props}
+      aria-hidden="true"
     />
   )
 }

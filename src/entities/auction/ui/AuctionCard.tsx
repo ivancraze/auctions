@@ -30,21 +30,23 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
       <div className={styles.heading}>
         <div>
           <p className={styles.number}>Заявка № {auction.cargoNumber}</p>
-          {auction.uuid ? (
-            <Link
-              className={styles.route}
-              search={(current) => ({
-                ...current,
-                page: current.page ?? 1,
-              })}
-              to="/auctions/$auctionUuid"
-              params={{ auctionUuid: auction.uuid }}
-            >
-              {auction.route}
-            </Link>
-          ) : (
-            <h2 className={styles.route}>{auction.route}</h2>
-          )}
+          <h2 className={styles.route}>
+            {auction.uuid ? (
+              <Link
+                className={styles.routeLink}
+                search={(current) => ({
+                  ...current,
+                  page: current.page ?? 1,
+                })}
+                to="/auctions/$auctionUuid"
+                params={{ auctionUuid: auction.uuid }}
+              >
+                {auction.route}
+              </Link>
+            ) : (
+              auction.route
+            )}
+          </h2>
         </div>
         <BadgeGroup>
           <Badge tone={auction.statusTone}>{auction.status}</Badge>

@@ -211,7 +211,11 @@ export function AuctionBetPage() {
   const detailQuery = useQuery(auctionQueries.detail(auctionUuid))
 
   if (detailQuery.isPending) {
-    return <StateCard aria-busy="true">Загрузка параметров ставки…</StateCard>
+    return (
+      <StateCard aria-busy="true" role="status">
+        Загрузка параметров ставки…
+      </StateCard>
+    )
   }
 
   if (detailQuery.isError) {
@@ -252,7 +256,7 @@ export function AuctionBetPage() {
         >
           Аукционы
         </Link>
-        <span>→</span>
+        <span aria-hidden="true">→</span>
         <Link
           params={{ auctionUuid }}
           search={(current) => ({ ...current, page: current.page ?? 1 })}
@@ -260,8 +264,8 @@ export function AuctionBetPage() {
         >
           Заявка № {detailQuery.data.main.cargo_num ?? 'Без номера'}
         </Link>
-        <span>→</span>
-        <span>Ставка</span>
+        <span aria-hidden="true">→</span>
+        <span aria-current="page">Ставка</span>
       </Breadcrumbs>
       <div className={styles.panel}>
         <header>

@@ -45,9 +45,11 @@ describe('AuctionBetPage', () => {
     expect(input).toHaveValue(119000)
     fireEvent.click(screen.getByRole('button', { name: 'Подтвердить ставку' }))
 
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Ставка успешно принята',
-    )
+    expect(
+      (await screen.findByText('Ставка успешно принята')).closest(
+        '[role="status"]',
+      ),
+    ).toBeInTheDocument()
     expect(useToastStore.getState().toast).toMatchObject({
       kind: 'success',
       text: 'Ставка успешно принята',
@@ -97,9 +99,11 @@ describe('AuctionBetPage', () => {
     })
 
     releaseResponse()
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Ставка успешно принята',
-    )
+    expect(
+      (await screen.findByText('Ставка успешно принята')).closest(
+        '[role="status"]',
+      ),
+    ).toBeInTheDocument()
   })
 
   /** Проверяет клиентские ограничения цены без обращения к backend. */
@@ -173,9 +177,9 @@ describe('AuctionBetPage', () => {
       await screen.findByText('Приём ставок уже завершён.'),
     ).toBeInTheDocument()
     expectLinkedFieldError(input, 'Приём ставок уже завершён.')
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Ставка не была принята',
-    )
+    expect(
+      screen.getByText('Ставка не была принята').closest('[role="alert"]'),
+    ).toBeInTheDocument()
     expect(useToastStore.getState().toast).toMatchObject({
       kind: 'error',
       text: 'Ставка не была принята',

@@ -26,3 +26,15 @@ body {
 a {
   color: inherit;
 }
+
+:where(
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: 3px solid #1769e0;
+  outline-offset: 3px;
+}

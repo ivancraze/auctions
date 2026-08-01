@@ -15,6 +15,18 @@
   min-width: 0;
 }
 
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .resultCount {
   flex: none;
   margin: 0;
@@ -102,7 +114,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .spinner {
-    animation-duration: 1.5s;
+    animation: none;
+  }
+
+  .list {
+    transition: none;
   }
 }
 

@@ -31,7 +31,11 @@ export function AuctionBetsPage() {
   })
 
   if (detailQuery.isPending) {
-    return <StateCard aria-busy="true">Загрузка истории ставок…</StateCard>
+    return (
+      <StateCard aria-busy="true" role="status">
+        Загрузка истории ставок…
+      </StateCard>
+    )
   }
 
   if (detailQuery.isError) {
@@ -78,7 +82,11 @@ export function AuctionBetsPage() {
   }
 
   if (betsQuery.isPending) {
-    return <StateCard aria-busy="true">Загрузка истории ставок…</StateCard>
+    return (
+      <StateCard aria-busy="true" role="status">
+        Загрузка истории ставок…
+      </StateCard>
+    )
   }
 
   if (betsQuery.isError) {
@@ -102,7 +110,7 @@ export function AuctionBetsPage() {
         >
           Аукционы
         </Link>
-        <span>→</span>
+        <span aria-hidden="true">→</span>
         <Link
           params={{ auctionUuid }}
           search={(current) => ({ ...current, page: current.page ?? 1 })}
@@ -110,8 +118,8 @@ export function AuctionBetsPage() {
         >
           Заявка № {cargoNumber}
         </Link>
-        <span>→</span>
-        <span>Ставки</span>
+        <span aria-hidden="true">→</span>
+        <span aria-current="page">Ставки</span>
       </Breadcrumbs>
       <PageHeading>
         <div>
@@ -142,16 +150,24 @@ export function AuctionBetsPage() {
           <p>Будьте первым участником аукциона.</p>
         </StateCard>
       ) : (
-        <div className={styles.tableWrap}>
+        <div
+          aria-label="Таблица истории ставок"
+          className={styles.tableWrap}
+          role="region"
+          tabIndex={0}
+        >
           <table className={styles.table}>
+            <caption className={styles.caption}>
+              История ставок по заявке № {cargoNumber}
+            </caption>
             <thead>
               <tr>
-                <th>Перевозчик</th>
-                <th>С НДС</th>
-                <th>Без НДС</th>
-                {hidePlaces ? null : <th>Место</th>}
-                <th>Дата</th>
-                <th>Статус</th>
+                <th scope="col">Перевозчик</th>
+                <th scope="col">С НДС</th>
+                <th scope="col">Без НДС</th>
+                {hidePlaces ? null : <th scope="col">Место</th>}
+                <th scope="col">Дата</th>
+                <th scope="col">Статус</th>
               </tr>
             </thead>
             <tbody>
@@ -172,8 +188,11 @@ export function AuctionBetsPage() {
                     {bet.isWinner ? (
                       <Badge tone="success">Победитель</Badge>
                     ) : bet.isCanceled ? (
-                      <span title={bet.cancelReason ?? undefined}>
-                        Отменена
+                      <span className={styles.canceledStatus}>
+                        <span>Отменена</span>
+                        {bet.cancelReason ? (
+                          <small>Причина: {bet.cancelReason}</small>
+                        ) : null}
                       </span>
                     ) : (
                       'Активна'

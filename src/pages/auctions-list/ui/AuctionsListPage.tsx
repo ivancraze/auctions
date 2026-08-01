@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import {
   AuctionCard,
@@ -34,11 +34,7 @@ const PER_PAGE = 3
 
 function AuctionsSkeleton() {
   return (
-    <div
-      className={styles.list}
-      aria-label="Загрузка аукционов"
-      aria-busy="true"
-    >
+    <div aria-hidden="true" className={styles.list}>
       {Array.from({ length: PER_PAGE }, (_, index) => (
         <AuctionCardSkeleton key={index} />
       ))}
@@ -48,7 +44,7 @@ function AuctionsSkeleton() {
 
 function AuctionsLoader() {
   return (
-    <div className={styles.loader} role="status" aria-live="polite">
+    <div aria-hidden="true" className={styles.loader}>
       <span className={styles.spinner} aria-hidden="true" />
       <span>Обновляем аукционы…</span>
     </div>
@@ -56,6 +52,10 @@ function AuctionsLoader() {
 }
 
 export function AuctionsListPage() {
+  const paginationFocusTarget = useRef<'previous' | 'next' | null>(null)
+  const previousPageButtonRef = useRef<HTMLButtonElement>(null)
+  const nextPageButtonRef = useRef<HTMLButtonElement>(null)
+  const paginationStatusRef = useRef<HTMLSpanElement>(null)
   const locationSearch = useRouterState({
     select: (state) => state.location.search,
   })
@@ -92,6 +92,32 @@ export function AuctionsListPage() {
     })
   }, [isPageOutOfRange, lastPage, navigate])
 
+  useEffect(() => {
+    if (isUpdating || !listQuery.isSuccess || !paginationFocusTarget.current) {
+      return
+    }
+
+    const targetButton =
+      paginationFocusTarget.current === 'previous'
+        ? previousPageButtonRef.current
+        : nextPageButtonRef.current
+
+    if (targetButton && !targetButton.disabled) {
+      targetButton.focus()
+    } else {
+      paginationStatusRef.current?.focus()
+    }
+    paginationFocusTarget.current = null
+  }, [isUpdating, listQuery.isSuccess, page])
+
+  const listStatus = listQuery.isPending
+    ? 'Загрузка аукционов…'
+    : isUpdating || isPageOutOfRange
+      ? 'Обновляем аукционы…'
+      : meta
+        ? `Найдено: ${meta.total ?? 0}. Страница ${page} из ${lastPage}.`
+        : ''
+
   return (
     <section>
       <PageHeading>
@@ -118,8 +144,17 @@ export function AuctionsListPage() {
 
         <div
           className={styles.content}
-          aria-busy={isUpdating || isPageOutOfRange}
+          aria-busy={listQuery.isPending || isUpdating || isPageOutOfRange}
         >
+          <p
+            className={styles.visuallyHidden}
+            role="status"
+            aria-atomic="true"
+            aria-live="polite"
+          >
+            {listStatus}
+          </p>
+
           {listQuery.isPending ? <AuctionsSkeleton /> : null}
 
           {isUpdating || isPageOutOfRange ? <AuctionsLoader /> : null}
@@ -179,21 +214,31 @@ export function AuctionsListPage() {
                 <button
                   className={styles.paginationButton}
                   disabled={page <= 1 || isUpdating}
-                  onClick={() =>
+                  onClick={() => {
+                    paginationFocusTarget.current = 'previous'
                     updateSearch({ ...search, page: Math.max(1, page - 1) })
-                  }
+                  }}
+                  ref={previousPageButtonRef}
                   type="button"
                 >
                   ← Назад
                 </button>
-                <span className={styles.paginationStatus}>
+                <span
+                  className={styles.paginationStatus}
+                  ref={paginationStatusRef}
+                  tabIndex={-1}
+                >
                   Страница <strong>{page}</strong> из{' '}
                   <strong>{lastPage}</strong>
                 </span>
                 <button
                   className={styles.paginationButton}
                   disabled={page >= lastPage || isUpdating}
-                  onClick={() => updateSearch({ ...search, page: page + 1 })}
+                  onClick={() => {
+                    paginationFocusTarget.current = 'next'
+                    updateSearch({ ...search, page: page + 1 })
+                  }}
+                  ref={nextPageButtonRef}
                   type="button"
                 >
                   Далее →

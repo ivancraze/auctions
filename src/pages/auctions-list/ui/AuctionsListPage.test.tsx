@@ -25,11 +25,14 @@ beforeEach(async () => {
 })
 
 describe('AuctionsListPage', () => {
+  /** Проверяет семантический заголовок маршрута и возврат фокуса после пагинации. */
   it('loads and renders auction cards', async () => {
     render(<AppProviders />)
 
     expect(await screen.findByText('Заявка № 00000002030')).toBeInTheDocument()
-    expect(screen.getByText('Казань → Санкт-Петербург')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Казань → Санкт-Петербург' }),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole('navigation', { name: 'Пагинация аукционов' }),
     ).toBeInTheDocument()
@@ -49,8 +52,10 @@ describe('AuctionsListPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Далее →' }))
     expect(await screen.findByText('Заявка № 00000002027')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Далее →' })).toHaveFocus()
   })
 
+  /** Проверяет понятное пустое состояние при отсутствии результатов. */
   it('renders the empty state', async () => {
     server.use(
       http.post('/api/v1/auctions/list', () =>
@@ -72,6 +77,7 @@ describe('AuctionsListPage', () => {
     expect(await screen.findByText('Аукционы не найдены')).toBeInTheDocument()
   })
 
+  /** Проверяет применение фильтра и сохранение его значения в URL. */
   it('applies filters and stores them in the URL search state', async () => {
     render(<AppProviders />)
     await screen.findByText('Заявка № 00000002030')
@@ -93,6 +99,7 @@ describe('AuctionsListPage', () => {
     expect(screen.queryByText('Заявка № 00000002030')).not.toBeInTheDocument()
   })
 
+  /** Проверяет возврат к ранее отфильтрованному списку со скрытой истории. */
   it('restores the filtered list after returning from hidden bets', async () => {
     await router.navigate({
       to: '/auctions',
@@ -123,6 +130,7 @@ describe('AuctionsListPage', () => {
     expect(screen.queryByText('Заявка № 00000002030')).not.toBeInTheDocument()
   })
 
+  /** Проверяет доступное сообщение API-ошибки и действие повторной загрузки. */
   it('renders a contract error and retry action', async () => {
     server.use(
       http.post('/api/v1/auctions/list', () =>

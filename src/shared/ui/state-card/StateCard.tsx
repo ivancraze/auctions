@@ -28,6 +28,6 @@ export function StateCard({
 export function StateCardTitle({
   className,
   ...props
-}: ComponentPropsWithoutRef<'p'>) {
-  return <p className={`${styles.title} ${className ?? ''}`} {...props} />
+}: ComponentPropsWithoutRef<'h2'>) {
+  return <h2 className={`${styles.title} ${className ?? ''}`} {...props} />
 }
