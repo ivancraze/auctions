@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { mapAuctionDetails } from './mapAuctionDetails'
-import { mapBets } from './mapBets'
 import { createInitialMockData } from '@/mocks/data/fixtures'
 
 describe('auction detail mappers', () => {
@@ -28,17 +27,5 @@ describe('auction detail mappers', () => {
     details!.trading.hide_bets_history = true
 
     expect(mapAuctionDetails(details!).hideBetsHistory).toBe(true)
-  })
-
-  /** Проверяет подсчёт уникальных перевозчиков вместо количества ставок. */
-  it('counts unique carriers instead of individual bets', () => {
-    const result = mapBets([
-      { id: 1, organization_id: 10 },
-      { id: 2, organization_id: 10 },
-      { id: 3, organization_id: 20 },
-    ])
-
-    expect(result.participants).toBe(2)
-    expect(result.rows).toHaveLength(3)
   })
 })

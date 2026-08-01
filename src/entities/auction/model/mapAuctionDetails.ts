@@ -1,3 +1,4 @@
+import { isBetsHistoryHidden } from './isBetsHistoryHidden'
 import type { AuctionDetails } from './types'
 
 const moneyFormatter = new Intl.NumberFormat('ru-RU', {
@@ -215,9 +216,7 @@ export function mapAuctionDetails(
         : 'Ставки нет',
     },
     canSetBet: details.trading.can_set_bet ?? false,
-    hideBetsHistory: Boolean(
-      details.hide_bets_history || details.trading.hide_bets_history,
-    ),
+    hideBetsHistory: isBetsHistoryHidden(details),
     hideContacts,
     noViewCargoPrice: details.trading.no_view_cargo_price ?? false,
   }

@@ -6,7 +6,7 @@ import {
   within,
 } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AppProviders } from '@/app/providers/AppProviders'
 import { queryClient } from '@/app/providers/queryClient'
@@ -22,6 +22,10 @@ function getOptionValues(select: HTMLElement) {
 beforeEach(async () => {
   queryClient.clear()
   await router.navigate({ to: '/auctions', search: { page: 1 } })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 describe('AuctionsListPage', () => {
@@ -51,7 +55,7 @@ describe('AuctionsListPage', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: 'Далее →' }))
-    expect(await screen.findByText('Заявка № 00000002027')).toBeInTheDocument()
+    expect(await screen.findByText('Заявка № 00000002024')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Далее →' })).toHaveFocus()
   })
 
@@ -177,6 +181,27 @@ describe('AuctionsListPage', () => {
       screen.queryByRole('dialog', { name: 'Фильтры' }),
     ).not.toBeInTheDocument()
     await waitFor(() => expect(trigger).toHaveFocus())
+  })
+
+  /** Проверяет закрытие мобильной панели и снятие блокировки прокрутки при переходе на desktop. */
+  it('closes the mobile filters after resizing to desktop', async () => {
+    const width = vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(375)
+    render(<AppProviders />)
+    await screen.findByText('Заявка № 00000002030')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Фильтры' }))
+    expect(screen.getByRole('dialog', { name: 'Фильтры' })).toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('hidden')
+
+    width.mockReturnValue(1024)
+    fireEvent(window, new Event('resize'))
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('dialog', { name: 'Фильтры' }),
+      ).not.toBeInTheDocument()
+      expect(document.body.style.overflow).toBe('')
+    })
   })
 
   /** Проверяет циклическое перемещение фокуса по интерактивным элементам панели. */

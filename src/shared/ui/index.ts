@@ -1,6 +1,6 @@
-export { Badge, BadgeGroup, type BadgeTone } from './badge/Badge'
+export { Badge, BadgeGroup } from './badge/Badge'
 export { Breadcrumbs } from './breadcrumbs/Breadcrumbs'
-export { Button, type ButtonVariant } from './button/Button'
+export { Button } from './button/Button'
 export { buttonClassName } from './button/buttonClassName'
 export { FieldText } from './field-text/FieldText'
 export { FormField, FormFieldGroup } from './form-field/FormField'

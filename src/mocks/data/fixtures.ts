@@ -666,7 +666,3 @@ export function createInitialMockData() {
     nextBetId: number
   }
 }
-
-export const mockCities = [
-  ...new Set(seeds.flatMap((seed) => [seed.origin, seed.destination])),
-].sort()

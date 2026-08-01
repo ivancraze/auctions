@@ -1,10 +1,4 @@
-import type {
-  AuctionDetails,
-  AuctionListRequest,
-  AuctionListResponse,
-  BetListResponse,
-  SetBetRequest,
-} from '../model/types'
+import type { AuctionListRequest, SetBetRequest } from '../model/types'
 import {
   apiRequest,
   apiRequestVoid,
@@ -15,7 +9,7 @@ import {
 
 export const auctionApi = {
   list(request: AuctionListRequest = {}, signal?: AbortSignal) {
-    return apiRequest<AuctionListResponse>(
+    return apiRequest(
       '/auctions/list',
       {
         method: 'POST',
@@ -27,7 +21,7 @@ export const auctionApi = {
   },
 
   getByUuid(auctionUuid: string, signal?: AbortSignal) {
-    return apiRequest<AuctionDetails>(
+    return apiRequest(
       `/auctions/${encodeURIComponent(auctionUuid)}`,
       {
         method: 'GET',
@@ -49,7 +43,7 @@ export const auctionApi = {
 
     const search = searchParams.size > 0 ? `?${searchParams.toString()}` : ''
 
-    return apiRequest<BetListResponse>(
+    return apiRequest(
       `/auctions/${encodeURIComponent(auctionUuid)}/bets${search}`,
       {
         method: 'GET',

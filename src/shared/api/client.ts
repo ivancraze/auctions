@@ -1,4 +1,4 @@
-import type { ZodIssue, ZodTypeAny } from 'zod'
+import type { ZodIssue, ZodType } from 'zod'
 
 import type { components } from './generated/schema'
 import { apiProblemSchema } from './responseSchemas'
@@ -71,11 +71,11 @@ async function apiFetch(path: string, init: RequestInit): Promise<Response> {
   return response
 }
 
-export async function apiRequest<T>(
+export async function apiRequest<TOutput>(
   path: string,
   init: RequestInit,
-  schema: ZodTypeAny,
-): Promise<T> {
+  schema: ZodType<TOutput>,
+): Promise<TOutput> {
   const response = await apiFetch(path, init)
   const body: unknown = await response.json()
   const result = schema.safeParse(body)
@@ -84,7 +84,7 @@ export async function apiRequest<T>(
     throw new ApiContractError(result.error.issues)
   }
 
-  return result.data as T
+  return result.data
 }
 
 export async function apiRequestVoid(

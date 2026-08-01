@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { FocusEvent, ReactNode } from 'react'
 
 import type { AuctionCardViewModel } from '../model/mapAuctionCard'
 import { Badge, BadgeGroup, FieldText } from '@/shared/ui'
@@ -15,12 +15,16 @@ export function AuctionCard({ actions, auction, onIntent }: AuctionCardProps) {
   const handleIntent = () => {
     if (auction.uuid) onIntent(auction.uuid)
   }
+  const handleFocus = (event: FocusEvent<HTMLElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget)) return
+    handleIntent()
+  }
 
   return (
     <article
       className={styles.card}
       onPointerEnter={handleIntent}
-      onFocus={handleIntent}
+      onFocus={handleFocus}
     >
       <div className={styles.heading}>
         <div>

@@ -2,7 +2,7 @@ import type { ComponentPropsWithoutRef } from 'react'
 
 import { buttonClassName } from './buttonClassName'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'disabled'
+export type ButtonVariant = 'primary' | 'secondary'
 
 interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   variant?: ButtonVariant
