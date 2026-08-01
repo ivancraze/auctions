@@ -208,8 +208,12 @@ export function AuctionFilters({
                 <option value="NotParticipating">Не участвую</option>
                 <option value="Leading">Лидирую</option>
                 <option value="Losing">Ставку перебили</option>
-                <option value="Winner">Победитель</option>
+                <option value="OnPending">Ожидает решения</option>
                 <option value="Confirmed">Подтверждён</option>
+                <option value="ChoosingWinner">Выбор победителя</option>
+                <option value="Winner">Победитель</option>
+                <option value="Accepted">Ставка принята</option>
+                <option value="Unknown">Неизвестный статус</option>
               </select>
             </FormField>
 
@@ -220,8 +224,10 @@ export function AuctionFilters({
                 <option value="1">Планирование</option>
                 <option value="2">Торги идут</option>
                 <option value="3">Определение победителя</option>
+                <option value="4">Ожидание сделки</option>
+                <option value="5">В работе</option>
                 <option value="6">Завершён</option>
-                <option value="8">Отменён</option>
+                <option value="7">Остановлен</option>
               </select>
             </FormField>
 

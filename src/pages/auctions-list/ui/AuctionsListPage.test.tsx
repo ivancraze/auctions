@@ -13,6 +13,11 @@ import { queryClient } from '@/app/providers/queryClient'
 import { router } from '@/app/router/router'
 import { auctionKeys } from '@/entities/auction'
 import { server } from '@/mocks/server'
+import { mockStore } from '@/mocks/store'
+
+function getOptionValues(select: HTMLElement) {
+  return Array.from(select.querySelectorAll('option'), (option) => option.value)
+}
 
 beforeEach(async () => {
   queryClient.clear()
@@ -185,5 +190,86 @@ describe('AuctionsListPage', () => {
 
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
     expect(resetButton).toHaveFocus()
+  })
+
+  /** Проверяет наличие всех пользовательских и аукционных статусов из OpenAPI. */
+  it('renders every status option supported by the list request', async () => {
+    render(<AppProviders />)
+    await screen.findByText('Заявка № 00000002030')
+
+    const userStatus = screen.getByLabelText('Ваш статус')
+    const auctionStatus = screen.getByLabelText('Статус аукциона')
+
+    expect(getOptionValues(userStatus)).toEqual([
+      '',
+      'NotParticipating',
+      'Leading',
+      'Losing',
+      'OnPending',
+      'Confirmed',
+      'ChoosingWinner',
+      'Winner',
+      'Accepted',
+      'Unknown',
+    ])
+    expect(getOptionValues(auctionStatus)).toEqual([
+      '',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+    ])
+  })
+
+  /** Проверяет коррекцию лишней страницы с сохранением выбранных фильтров. */
+  it('replaces an excessive page with the last page and loads its data', async () => {
+    const lastPage = 12
+    const auction = mockStore.auctions[0]!
+    const requestedPages: number[] = []
+
+    server.use(
+      http.post('/api/v1/auctions/list', async ({ request }) => {
+        const body = (await request.json()) as { page?: number }
+        const page = body.page ?? 1
+        requestedPages.push(page)
+
+        return HttpResponse.json({
+          data: page === lastPage ? [auction] : [],
+          meta: {
+            current_page: page,
+            from: page === lastPage ? 34 : 0,
+            last_page: lastPage,
+            per_page: 3,
+            to: page === lastPage ? 34 : 0,
+            total: 34,
+          },
+        })
+      }),
+    )
+    await router.navigate({
+      to: '/auctions',
+      search: {
+        page: 99,
+        load_city: 'Самара',
+        status: 'NotParticipating',
+      },
+    })
+
+    render(<AppProviders />)
+
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        page: lastPage,
+        load_city: 'Самара',
+        status: 'NotParticipating',
+      })
+    })
+    expect(
+      await screen.findByText(`Заявка № ${auction.main?.cargo_num}`),
+    ).toBeInTheDocument()
+    expect(requestedPages).toEqual([99, lastPage])
   })
 })

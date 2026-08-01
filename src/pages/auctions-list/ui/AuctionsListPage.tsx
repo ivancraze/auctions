@@ -4,6 +4,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 import {
   AuctionCard,
@@ -76,8 +77,20 @@ export function AuctionsListPage() {
 
   const items = listQuery.data?.data ?? []
   const meta = listQuery.data?.meta
-  const lastPage = meta?.last_page ?? 1
+  const lastPage = Math.max(1, meta?.last_page ?? 1)
   const page = search.page
+  const isPageOutOfRange =
+    listQuery.isSuccess && meta?.last_page !== undefined && page > lastPage
+
+  useEffect(() => {
+    if (!isPageOutOfRange) return
+
+    void navigate({
+      to: '/auctions',
+      search: (current) => ({ ...current, page: lastPage }),
+      replace: true,
+    })
+  }, [isPageOutOfRange, lastPage, navigate])
 
   return (
     <section>
@@ -103,12 +116,15 @@ export function AuctionsListPage() {
           onReset={() => updateSearch(defaultAuctionSearch)}
         />
 
-        <div className={styles.content} aria-busy={isUpdating}>
+        <div
+          className={styles.content}
+          aria-busy={isUpdating || isPageOutOfRange}
+        >
           {listQuery.isPending ? <AuctionsSkeleton /> : null}
 
-          {isUpdating ? <AuctionsLoader /> : null}
+          {isUpdating || isPageOutOfRange ? <AuctionsLoader /> : null}
 
-          {listQuery.isError && !isUpdating ? (
+          {listQuery.isError && !isUpdating && !isPageOutOfRange ? (
             <StateCard role="alert" tone="error">
               <StateCardTitle>Не удалось загрузить аукционы</StateCardTitle>
               <p>
@@ -126,14 +142,20 @@ export function AuctionsListPage() {
             </StateCard>
           ) : null}
 
-          {listQuery.isSuccess && !isUpdating && items.length === 0 ? (
+          {listQuery.isSuccess &&
+          !isUpdating &&
+          !isPageOutOfRange &&
+          items.length === 0 ? (
             <StateCard>
               <StateCardTitle>Аукционы не найдены</StateCardTitle>
               <p>Попробуйте изменить условия поиска.</p>
             </StateCard>
           ) : null}
 
-          {listQuery.isSuccess && !isUpdating && items.length > 0 ? (
+          {listQuery.isSuccess &&
+          !isUpdating &&
+          !isPageOutOfRange &&
+          items.length > 0 ? (
             <>
               <div className={styles.list}>
                 {items.map((item, index) => {

@@ -4,6 +4,7 @@ import { buildAuctionListRequest } from './buildAuctionListRequest'
 import { auctionSearchSchema } from './searchSchema'
 
 describe('auction search params', () => {
+  /** Проверяет безопасные значения по умолчанию для некорректных параметров URL. */
   it('uses safe fallback values for invalid URL input', () => {
     const result = auctionSearchSchema.parse({
       page: 'invalid',
@@ -20,6 +21,7 @@ describe('auction search params', () => {
     })
   })
 
+  /** Проверяет преобразование валидных параметров поиска в запрос по OpenAPI. */
   it('builds an OpenAPI list request from validated search params', () => {
     const search = auctionSearchSchema.parse({
       page: 2,
@@ -47,5 +49,31 @@ describe('auction search params', () => {
     })
     expect(request.load_date_from).toMatch(/^2026-08-01T/)
     expect(request.load_date_to).toMatch(/^2026-08-05T/)
+  })
+
+  /** Проверяет поддержку всех строковых статусов пользователя из OpenAPI. */
+  it.each([
+    'NotParticipating',
+    'Leading',
+    'Losing',
+    'OnPending',
+    'Confirmed',
+    'ChoosingWinner',
+    'Winner',
+    'Accepted',
+    'Unknown',
+  ] as const)('accepts the %s user status from OpenAPI', (status) => {
+    const search = auctionSearchSchema.parse({ status })
+
+    expect(search.status).toBe(status)
+    expect(buildAuctionListRequest(search, 20).status).toEqual([status])
+  })
+
+  /** Проверяет отбрасывание числового статуса вне диапазона request DTO. */
+  it('rejects auction status 8 outside the OpenAPI request range', () => {
+    const search = auctionSearchSchema.parse({ statuses: 8 })
+
+    expect(search.statuses).toBeUndefined()
+    expect(buildAuctionListRequest(search, 20).statuses).toBeUndefined()
   })
 })

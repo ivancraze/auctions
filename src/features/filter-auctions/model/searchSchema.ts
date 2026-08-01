@@ -34,14 +34,24 @@ export const auctionSearchSchema = z.object({
     .preprocess(
       emptyToUndefined,
       z
-        .enum(['NotParticipating', 'Leading', 'Losing', 'Winner', 'Confirmed'])
+        .enum([
+          'NotParticipating',
+          'Leading',
+          'Losing',
+          'OnPending',
+          'Confirmed',
+          'ChoosingWinner',
+          'Winner',
+          'Accepted',
+          'Unknown',
+        ])
         .optional(),
     )
     .catch(undefined),
   statuses: z
     .preprocess(
       (value) => (value === '' || value == null ? undefined : Number(value)),
-      z.number().int().min(1).max(8).optional(),
+      z.number().int().min(1).max(7).optional(),
     )
     .catch(undefined),
   auc_type: z
