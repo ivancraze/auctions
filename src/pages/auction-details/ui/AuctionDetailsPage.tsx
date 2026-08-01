@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from '@tanstack/react-router'
 
+import { AuctionDetailsSkeleton } from './AuctionDetailsSkeleton'
 import { auctionQueries, mapAuctionDetails } from '@/entities/auction'
 import { ApiError } from '@/shared/api/client'
 import {
@@ -11,34 +12,16 @@ import {
   buttonClassName,
   Eyebrow,
   FieldText,
-  Skeleton,
   StateCard,
 } from '@/shared/ui'
 
 import styles from './AuctionDetailsPage.module.scss'
 
-function DetailSkeleton() {
-  return (
-    <div
-      className={styles.grid}
-      aria-busy="true"
-      aria-label="Загрузка аукциона"
-    >
-      {Array.from({ length: 4 }, (_, index) => (
-        <div className={styles.section} key={index}>
-          <Skeleton variant="title" />
-          <Skeleton variant="block" />
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export function AuctionDetailsPage() {
   const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid' })
   const detailQuery = useQuery(auctionQueries.detail(auctionUuid))
 
-  if (detailQuery.isPending) return <DetailSkeleton />
+  if (detailQuery.isPending) return <AuctionDetailsSkeleton />
 
   if (detailQuery.isError) {
     const isNotFound =
