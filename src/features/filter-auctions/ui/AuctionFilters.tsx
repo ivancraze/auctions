@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useFilterUiStore } from '../model/filterUiStore'
@@ -24,6 +24,16 @@ const stringToNumber = (value: unknown) =>
   value === '' ? undefined : Number(value)
 const stringToBoolean = (value: unknown) =>
   value === '' ? undefined : value === 'true'
+const filtersPanelId = 'auction-filters-panel'
+const filtersTitleId = 'auction-filters-title'
+const focusableElementSelector = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
 
 export function AuctionFilters({
   values,
@@ -31,6 +41,8 @@ export function AuctionFilters({
   onReset,
 }: AuctionFiltersProps) {
   const panelRef = useRef<HTMLElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const isOpen = useFilterUiStore((state) => state.isOpen)
   const open = useFilterUiStore((state) => state.open)
   const close = useFilterUiStore((state) => state.close)
@@ -47,6 +59,58 @@ export function AuctionFilters({
     onApply({ ...formValues, page: 1 })
     close()
   })
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const previouslyFocusedElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : triggerRef.current
+    const previousBodyOverflow = document.body.style.overflow
+
+    closeButtonRef.current?.focus()
+    document.body.style.overflow = 'hidden'
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        close()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const focusableElements = Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          focusableElementSelector,
+        ) ?? [],
+      )
+      const firstElement = focusableElements.at(0)
+      const lastElement = focusableElements.at(-1)
+
+      if (!firstElement || !lastElement) {
+        event.preventDefault()
+        return
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = previousBodyOverflow
+      previouslyFocusedElement?.focus()
+    }
+  }, [close, isOpen])
 
   useLayoutEffect(() => {
     let animationFrame = 0
@@ -92,7 +156,14 @@ export function AuctionFilters({
 
   return (
     <>
-      <button className={styles.trigger} onClick={open} type="button">
+      <button
+        aria-controls={filtersPanelId}
+        aria-expanded={isOpen}
+        className={styles.trigger}
+        onClick={open}
+        ref={triggerRef}
+        type="button"
+      >
         Фильтры
       </button>
       {isOpen ? (
@@ -104,15 +175,20 @@ export function AuctionFilters({
         />
       ) : null}
       <aside
+        aria-labelledby={filtersTitleId}
+        aria-modal={isOpen || undefined}
         className={`${styles.panel} ${isOpen ? styles.open : ''}`}
+        id={filtersPanelId}
         ref={panelRef}
+        role={isOpen ? 'dialog' : undefined}
       >
         <div className={styles.heading}>
-          <h2>Фильтры</h2>
+          <h2 id={filtersTitleId}>Фильтры</h2>
           <button
             aria-label="Закрыть фильтры"
             className={styles.close}
             onClick={close}
+            ref={closeButtonRef}
             type="button"
           >
             ×

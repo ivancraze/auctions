@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -133,5 +139,51 @@ describe('AuctionsListPage', () => {
     expect(
       screen.getByRole('button', { name: 'Повторить' }),
     ).toBeInTheDocument()
+  })
+
+  /** Проверяет семантику модального окна и восстановление фокуса после Escape. */
+  it('opens the mobile filters as a dialog and restores focus on Escape', async () => {
+    render(<AppProviders />)
+    await screen.findByText('Заявка № 00000002030')
+
+    const trigger = screen.getByRole('button', { name: 'Фильтры' })
+    trigger.focus()
+    fireEvent.click(trigger)
+
+    const dialog = screen.getByRole('dialog', { name: 'Фильтры' })
+    const closeButton = within(dialog).getByRole('button', {
+      name: 'Закрыть фильтры',
+    })
+
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(closeButton).toHaveFocus()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Фильтры' }),
+    ).not.toBeInTheDocument()
+    await waitFor(() => expect(trigger).toHaveFocus())
+  })
+
+  /** Проверяет циклическое перемещение фокуса по интерактивным элементам панели. */
+  it('keeps Tab focus inside the mobile filters dialog', async () => {
+    render(<AppProviders />)
+    await screen.findByText('Заявка № 00000002030')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Фильтры' }))
+
+    const dialog = screen.getByRole('dialog', { name: 'Фильтры' })
+    const closeButton = within(dialog).getByRole('button', {
+      name: 'Закрыть фильтры',
+    })
+    const resetButton = within(dialog).getByRole('button', { name: 'Сбросить' })
+
+    resetButton.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(closeButton).toHaveFocus()
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+    expect(resetButton).toHaveFocus()
   })
 })
