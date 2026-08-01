@@ -9,6 +9,4 @@ import {
 export const auctionListResponseSchema = ListAuctionsResponse
 export const auctionDetailsResponseSchema = GetAuctionResponse
 export const betListResponseSchema = ListBetsResponse
-export const problemDetailSchema = ProblemDetail
-export const validationProblemSchema = ValidationProblem
 export const apiProblemSchema = ValidationProblem.or(ProblemDetail)

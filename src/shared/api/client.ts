@@ -5,7 +5,7 @@ import { apiProblemSchema } from './responseSchemas'
 
 const API_BASE_URL = '/api/v1'
 
-export type ApiProblem =
+type ApiProblem =
   | components['schemas']['ProblemDetail']
   | components['schemas']['ValidationProblem']
 
