@@ -215,8 +215,9 @@ export function mapAuctionDetails(
         : 'Ставки нет',
     },
     canSetBet: details.trading.can_set_bet ?? false,
-    hideBetsHistory:
-      details.hide_bets_history ?? details.trading.hide_bets_history ?? false,
+    hideBetsHistory: Boolean(
+      details.hide_bets_history || details.trading.hide_bets_history,
+    ),
     hideContacts,
     noViewCargoPrice: details.trading.no_view_cargo_price ?? false,
   }

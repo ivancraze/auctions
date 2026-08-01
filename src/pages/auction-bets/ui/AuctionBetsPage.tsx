@@ -21,33 +21,33 @@ export function AuctionBetsPage() {
   const search = useSearch({ from: '/auctions/$auctionUuid/bets' })
   const navigate = useNavigate({ from: '/auctions/$auctionUuid/bets' })
   const detailQuery = useQuery(auctionQueries.detail(auctionUuid))
-  const isHidden =
-    detailQuery.data?.hide_bets_history ??
-    detailQuery.data?.trading.hide_bets_history ??
-    false
+  const isHidden = Boolean(
+    detailQuery.data?.hide_bets_history ||
+    detailQuery.data?.trading.hide_bets_history,
+  )
   const betsQuery = useQuery({
     ...auctionQueries.bets(auctionUuid, search.all ?? false),
     enabled: detailQuery.isSuccess && !isHidden,
   })
 
-  if (detailQuery.isPending || (!isHidden && betsQuery.isPending)) {
+  if (detailQuery.isPending) {
     return <StateCard aria-busy="true">Загрузка истории ставок…</StateCard>
   }
 
-  const error = detailQuery.error ?? betsQuery.error
-  if (error) {
-    const isNotFound = error instanceof ApiError && error.status === 404
+  if (detailQuery.isError) {
+    const isNotFound =
+      detailQuery.error instanceof ApiError && detailQuery.error.status === 404
     return (
       <StateCard role="alert" tone="error">
         <h1>
-          {isNotFound ? 'Аукцион не найден' : 'Не удалось загрузить ставки'}
+          {isNotFound ? 'Аукцион не найден' : 'Не удалось загрузить аукцион'}
         </h1>
-        <p>{error.message}</p>
+        <p>{detailQuery.error.message}</p>
       </StateCard>
     )
   }
 
-  const cargoNumber = detailQuery.data?.main.cargo_num ?? 'Без номера'
+  const cargoNumber = detailQuery.data.main.cargo_num ?? 'Без номера'
 
   if (isHidden) {
     return (
@@ -77,6 +77,20 @@ export function AuctionBetsPage() {
     )
   }
 
+  if (betsQuery.isPending) {
+    return <StateCard aria-busy="true">Загрузка истории ставок…</StateCard>
+  }
+
+  if (betsQuery.isError) {
+    return (
+      <StateCard role="alert" tone="error">
+        <h1>Не удалось загрузить ставки</h1>
+        <p>{betsQuery.error.message}</p>
+      </StateCard>
+    )
+  }
+
+  const hidePlaces = detailQuery.data.trading.hide_places ?? false
   const bets = mapBets(betsQuery.data?.bets ?? [])
 
   return (
@@ -135,7 +149,7 @@ export function AuctionBetsPage() {
                 <th>Перевозчик</th>
                 <th>С НДС</th>
                 <th>Без НДС</th>
-                <th>Место</th>
+                {hidePlaces ? null : <th>Место</th>}
                 <th>Дата</th>
                 <th>Статус</th>
               </tr>
@@ -152,7 +166,7 @@ export function AuctionBetsPage() {
                   </td>
                   <td>{bet.priceWithVat}</td>
                   <td>{bet.priceNoVat}</td>
-                  <td>{bet.place}</td>
+                  {hidePlaces ? null : <td>{bet.place}</td>}
                   <td>{bet.createdAt}</td>
                   <td>
                     {bet.isWinner ? (
