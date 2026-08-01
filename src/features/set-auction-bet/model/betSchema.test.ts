@@ -5,6 +5,7 @@ import { createBetSchema } from './betSchema'
 const schema = createBetSchema({ min: 10000, max: 300000, step: 1000 })
 
 describe('bet validation schema', () => {
+  /** Проверяет допустимые цены, включая обе границы диапазона ставки. */
   it.each([10000, 119000, 300000])(
     'accepts valid price %s including constraint boundaries',
     (price) => {
@@ -12,6 +13,7 @@ describe('bet validation schema', () => {
     },
   )
 
+  /** Проверяет сообщения для каждого ограничения и некорректного значения цены. */
   it.each([
     [{}, 'Введите цену ставки.'],
     [{ price: Number.NaN }, 'Введите цену ставки.'],
@@ -32,6 +34,7 @@ describe('bet validation schema', () => {
     }
   })
 
+  /** Проверяет положительную конечную цену при отсутствии ограничений аукциона. */
   it('accepts any positive finite price when constraints are absent', () => {
     const unconstrainedSchema = createBetSchema({
       min: null,
