@@ -76,6 +76,10 @@ describe('AuctionsListPage', () => {
         cargo_num: '00000001002',
       })
     })
+    expect(
+      await screen.findByText('Заявка № 00000001002', {}, { timeout: 2_500 }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Заявка № 00000002030')).not.toBeInTheDocument()
   })
 
   it('renders a contract error and retry action', async () => {

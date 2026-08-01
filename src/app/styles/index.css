@@ -108,6 +108,30 @@ a {
   min-width: 0;
 }
 
+.auctions-loader {
+  display: grid;
+  min-height: 320px;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  border: 1px solid #dfe4ec;
+  border-radius: 18px;
+  color: #596579;
+  background: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  box-shadow: 0 8px 28px rgb(23 32 51 / 5%);
+}
+
+.auctions-loader__spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #dce8f9;
+  border-top-color: #1769e0;
+  border-radius: 50%;
+  animation: auctions-loader-spin 700ms linear infinite;
+}
+
 .filters-panel {
   position: sticky;
   top: 20px;
@@ -179,11 +203,6 @@ a {
   display: grid;
   gap: 8px;
   margin-top: 6px;
-}
-
-.auction-list--updating {
-  opacity: 0.58;
-  pointer-events: none;
 }
 
 .auction-card {
@@ -837,6 +856,18 @@ a.auction-card__route:hover {
 @keyframes skeleton-loading {
   to {
     background-position-x: -200%;
+  }
+}
+
+@keyframes auctions-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auctions-loader__spinner {
+    animation-duration: 1.5s;
   }
 }
 

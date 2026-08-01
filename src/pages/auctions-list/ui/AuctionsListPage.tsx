@@ -3,13 +3,16 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { auctionQueries } from '@/entities/auction/api/auctionQueries'
 import { mapAuctionCard } from '@/entities/auction/model/mapAuctionCard'
 import { AuctionCard } from '@/entities/auction/ui/AuctionCard'
 import { buildAuctionListRequest } from '@/features/filter-auctions/model/buildAuctionListRequest'
-import { defaultAuctionSearch } from '@/features/filter-auctions/model/searchSchema'
+import {
+  auctionSearchSchema,
+  defaultAuctionSearch,
+} from '@/features/filter-auctions/model/searchSchema'
 import { AuctionFilters } from '@/features/filter-auctions/ui/AuctionFilters'
 import { ApiError } from '@/shared/api/client'
 
@@ -37,17 +40,30 @@ function AuctionsSkeleton() {
   )
 }
 
+function AuctionsLoader() {
+  return (
+    <div className="auctions-loader" role="status" aria-live="polite">
+      <span className="auctions-loader__spinner" aria-hidden="true" />
+      <span>Обновляем аукционы…</span>
+    </div>
+  )
+}
+
 export function AuctionsListPage() {
-  const search = useSearch({ from: '/auctions' })
+  const locationSearch = useRouterState({
+    select: (state) => state.location.search,
+  })
+  const search = auctionSearchSchema.parse(locationSearch)
   const navigate = useNavigate({ from: '/auctions' })
   const queryClient = useQueryClient()
   const listQuery = useQuery({
     ...auctionQueries.list(buildAuctionListRequest(search, PER_PAGE)),
     placeholderData: keepPreviousData,
   })
+  const isUpdating = listQuery.isFetching && !listQuery.isPending
 
   const updateSearch = (nextSearch: typeof search) => {
-    void navigate({ search: nextSearch })
+    void navigate({ to: '/auctions', search: nextSearch })
   }
   const prefetchDetails = (auctionUuid: string) => {
     void queryClient.prefetchQuery(auctionQueries.detail(auctionUuid))
@@ -82,10 +98,12 @@ export function AuctionsListPage() {
           onReset={() => updateSearch(defaultAuctionSearch)}
         />
 
-        <div className="auctions-content">
+        <div className="auctions-content" aria-busy={isUpdating}>
           {listQuery.isPending ? <AuctionsSkeleton /> : null}
 
-          {listQuery.isError ? (
+          {isUpdating ? <AuctionsLoader /> : null}
+
+          {listQuery.isError && !isUpdating ? (
             <div className="state-card state-card--error" role="alert">
               <p className="state-card__title">Не удалось загрузить аукционы</p>
               <p>
@@ -103,18 +121,16 @@ export function AuctionsListPage() {
             </div>
           ) : null}
 
-          {listQuery.isSuccess && items.length === 0 ? (
+          {listQuery.isSuccess && !isUpdating && items.length === 0 ? (
             <div className="state-card">
               <p className="state-card__title">Аукционы не найдены</p>
               <p>Попробуйте изменить условия поиска.</p>
             </div>
           ) : null}
 
-          {listQuery.isSuccess && items.length > 0 ? (
+          {listQuery.isSuccess && !isUpdating && items.length > 0 ? (
             <>
-              <div
-                className={`auction-list ${listQuery.isPlaceholderData ? 'auction-list--updating' : ''}`}
-              >
+              <div className="auction-list">
                 {items.map((item, index) => {
                   const viewModel = mapAuctionCard(item)
                   return (
@@ -132,7 +148,7 @@ export function AuctionsListPage() {
               <nav className="pagination" aria-label="Пагинация аукционов">
                 <button
                   className="pagination__button"
-                  disabled={page <= 1 || listQuery.isPlaceholderData}
+                  disabled={page <= 1 || isUpdating}
                   onClick={() =>
                     updateSearch({ ...search, page: Math.max(1, page - 1) })
                   }
@@ -146,7 +162,7 @@ export function AuctionsListPage() {
                 </span>
                 <button
                   className="pagination__button"
-                  disabled={page >= lastPage || listQuery.isPlaceholderData}
+                  disabled={page >= lastPage || isUpdating}
                   onClick={() => updateSearch({ ...search, page: page + 1 })}
                   type="button"
                 >

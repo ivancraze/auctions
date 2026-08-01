@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 
 import type {
   AuctionDetails,
@@ -12,6 +12,7 @@ import type {
 import { mockStore } from './store'
 
 const API_URL = '/api/v1'
+const AUCTION_LIST_DELAY_MS = 700
 
 const auctionStatusById = [
   'Planning',
@@ -250,6 +251,8 @@ function updatePrice(detail: AuctionDetails, price: number) {
 
 export const handlers = [
   http.post(`${API_URL}/auctions/list`, async ({ request }) => {
+    await delay(AUCTION_LIST_DELAY_MS)
+
     let body: AuctionListRequest
 
     try {
