@@ -68,15 +68,13 @@ export function AuctionDetailsPage() {
           </BadgeGroup>
         </div>
         <div className={styles.actions}>
-          {!auction.hideBetsHistory ? (
-            <Link
-              className={buttonClassName('secondary')}
-              params={{ auctionUuid }}
-              to="/auctions/$auctionUuid/bets"
-            >
-              История ставок
-            </Link>
-          ) : null}
+          <Link
+            className={buttonClassName('secondary')}
+            params={{ auctionUuid }}
+            to="/auctions/$auctionUuid/bets"
+          >
+            История ставок
+          </Link>
           {auction.canSetBet ? (
             <Link
               className={buttonClassName('primary')}
