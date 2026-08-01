@@ -9,6 +9,13 @@
   font-size: 0.875rem;
 }
 
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .tableWrap {
   overflow-x: auto;
   border: 1px solid #dfe4ec;

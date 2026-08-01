@@ -18,6 +18,7 @@ describe('AuctionBetPage', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bet',
       params: { auctionUuid: availableAuctionUuid },
+      search: { page: 1 },
     })
     render(<AppProviders />)
 
@@ -39,6 +40,7 @@ describe('AuctionBetPage', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bet',
       params: { auctionUuid: availableAuctionUuid },
+      search: { page: 1 },
     })
     render(<AppProviders />)
 
@@ -74,6 +76,7 @@ describe('AuctionBetPage', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bet',
       params: { auctionUuid: availableAuctionUuid },
+      search: { page: 1 },
     })
     render(<AppProviders />)
 
@@ -92,6 +95,7 @@ describe('AuctionBetPage', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bet',
       params: { auctionUuid: '550e8400-e29b-41d4-a716-446655440003' },
+      search: { page: 1 },
     })
     render(<AppProviders />)
 

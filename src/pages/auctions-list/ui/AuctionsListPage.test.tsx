@@ -82,6 +82,36 @@ describe('AuctionsListPage', () => {
     expect(screen.queryByText('Заявка № 00000002030')).not.toBeInTheDocument()
   })
 
+  it('restores the filtered list after returning from hidden bets', async () => {
+    await router.navigate({
+      to: '/auctions',
+      search: {
+        page: 1,
+        cargo_num: '00000002029',
+        status: 'Confirmed',
+      },
+    })
+    render(<AppProviders />)
+
+    expect(await screen.findByText('Заявка № 00000002029')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('link', { name: 'Смотреть ставки' }))
+
+    expect(await screen.findByText('История ставок скрыта')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('link', { name: 'Вернуться к списку' }))
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/auctions')
+      expect(router.state.location.search).toMatchObject({
+        page: 1,
+        cargo_num: '00000002029',
+        status: 'Confirmed',
+      })
+    })
+    expect(await screen.findByText('Заявка № 00000002029')).toBeInTheDocument()
+    expect(screen.getByLabelText('Номер заявки')).toHaveValue('00000002029')
+    expect(screen.queryByText('Заявка № 00000002030')).not.toBeInTheDocument()
+  })
+
   it('renders a contract error and retry action', async () => {
     server.use(
       http.post('/api/v1/auctions/list', () =>

@@ -33,6 +33,10 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
           {auction.uuid ? (
             <Link
               className={styles.route}
+              search={(current) => ({
+                ...current,
+                page: current.page ?? 1,
+              })}
               to="/auctions/$auctionUuid"
               params={{ auctionUuid: auction.uuid }}
             >
@@ -84,8 +88,12 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
         ) : (
           <Link
             className={buttonClassName('primary')}
-            to={auction.action.to}
             params={{ auctionUuid: auction.uuid }}
+            search={(current) => ({
+              ...current,
+              page: current.page ?? 1,
+            })}
+            to={auction.action.to}
           >
             {auction.action.label}
           </Link>

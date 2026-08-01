@@ -35,22 +35,32 @@ const auctionsRoute = createRoute({
   component: AuctionsListPage,
 })
 
+const validateAuctionSearch = (search: Record<string, unknown>) =>
+  auctionSearchSchema.parse(search)
+
+const validateAuctionBetsSearch = (search: Record<string, unknown>) => ({
+  ...auctionSearchSchema.parse(search),
+  ...betsSearchSchema.parse(search),
+})
+
 const auctionDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auctions/$auctionUuid',
+  validateSearch: validateAuctionSearch,
   component: AuctionDetailsPage,
 })
 
 const auctionBetsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auctions/$auctionUuid/bets',
-  validateSearch: (search) => betsSearchSchema.parse(search),
+  validateSearch: validateAuctionBetsSearch,
   component: AuctionBetsPage,
 })
 
 const auctionBetRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auctions/$auctionUuid/bet',
+  validateSearch: validateAuctionSearch,
   component: AuctionBetPage,
 })
 

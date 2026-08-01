@@ -55,13 +55,24 @@ export function AuctionBetsPage() {
         <Eyebrow>Заявка № {cargoNumber}</Eyebrow>
         <h1>История ставок скрыта</h1>
         <p>Организатор ограничил просмотр ставок этого аукциона.</p>
-        <Link
-          className={buttonClassName('secondary')}
-          params={{ auctionUuid }}
-          to="/auctions/$auctionUuid"
-        >
-          Вернуться к аукциону
-        </Link>
+        <div className={styles.actions}>
+          <Link
+            className={buttonClassName('secondary')}
+            search={(current) => ({ ...current, page: current.page ?? 1 })}
+            to="/auctions"
+          >
+            Вернуться к списку
+          </Link>
+
+          <Link
+            className={buttonClassName('primary')}
+            params={{ auctionUuid }}
+            search={(current) => ({ ...current, page: current.page ?? 1 })}
+            to="/auctions/$auctionUuid"
+          >
+            Вернуться к аукциону
+          </Link>
+        </div>
       </StateCard>
     )
   }
@@ -71,11 +82,18 @@ export function AuctionBetsPage() {
   return (
     <section>
       <Breadcrumbs>
-        <Link search={{ page: 1 }} to="/auctions">
+        <Link
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
+          to="/auctions"
+        >
           Аукционы
         </Link>
         <span>→</span>
-        <Link params={{ auctionUuid }} to="/auctions/$auctionUuid">
+        <Link
+          params={{ auctionUuid }}
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
+          to="/auctions/$auctionUuid"
+        >
           Заявка № {cargoNumber}
         </Link>
         <span>→</span>
@@ -92,7 +110,10 @@ export function AuctionBetsPage() {
             checked={search.all ?? false}
             onChange={(event) =>
               void navigate({
-                search: { all: event.target.checked || undefined },
+                search: (current) => ({
+                  ...current,
+                  all: event.target.checked || undefined,
+                }),
               })
             }
             type="checkbox"

@@ -14,6 +14,7 @@ describe('auction detail and bets pages', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid',
       params: { auctionUuid: '550e8400-e29b-41d4-a716-446655440001' },
+      search: { page: 1 },
     })
     render(<AppProviders />)
 
@@ -29,7 +30,7 @@ describe('auction detail and bets pages', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bets',
       params: { auctionUuid: '550e8400-e29b-41d4-a716-446655440004' },
-      search: {},
+      search: { page: 1 },
     })
     render(<AppProviders />)
 
@@ -40,7 +41,7 @@ describe('auction detail and bets pages', () => {
     await router.navigate({
       to: '/auctions/$auctionUuid/bets',
       params: { auctionUuid: '550e8400-e29b-41d4-a716-446655440002' },
-      search: {},
+      search: { page: 1 },
     })
     render(<AppProviders />)
 

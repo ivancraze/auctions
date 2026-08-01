@@ -84,6 +84,7 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
       await navigate({
         to: '/auctions/$auctionUuid',
         params: { auctionUuid },
+        search: (current) => ({ ...current, page: current.page ?? 1 }),
       })
     } catch (error) {
       if (
@@ -169,6 +170,7 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
         <Link
           className={buttonClassName('secondary')}
           params={{ auctionUuid }}
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
           to="/auctions/$auctionUuid"
         >
           Отмена
@@ -206,6 +208,7 @@ export function AuctionBetPage() {
         <Link
           className={buttonClassName('secondary')}
           params={{ auctionUuid }}
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
           to="/auctions/$auctionUuid"
         >
           Вернуться к аукциону
@@ -217,11 +220,18 @@ export function AuctionBetPage() {
   return (
     <section>
       <Breadcrumbs>
-        <Link search={{ page: 1 }} to="/auctions">
+        <Link
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
+          to="/auctions"
+        >
           Аукционы
         </Link>
         <span>→</span>
-        <Link params={{ auctionUuid }} to="/auctions/$auctionUuid">
+        <Link
+          params={{ auctionUuid }}
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
+          to="/auctions/$auctionUuid"
+        >
           Заявка № {detailQuery.data.main.cargo_num ?? 'Без номера'}
         </Link>
         <span>→</span>

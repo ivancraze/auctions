@@ -34,7 +34,7 @@ export function AuctionDetailsPage() {
         <p>{detailQuery.error.message}</p>
         <Link
           className={buttonClassName('secondary')}
-          search={{ page: 1 }}
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
           to="/auctions"
         >
           Вернуться к списку
@@ -48,7 +48,10 @@ export function AuctionDetailsPage() {
   return (
     <article>
       <Breadcrumbs>
-        <Link search={{ page: 1 }} to="/auctions">
+        <Link
+          search={(current) => ({ ...current, page: current.page ?? 1 })}
+          to="/auctions"
+        >
           Аукционы
         </Link>
         <span>→</span>
@@ -71,6 +74,7 @@ export function AuctionDetailsPage() {
           <Link
             className={buttonClassName('secondary')}
             params={{ auctionUuid }}
+            search={(current) => ({ ...current, page: current.page ?? 1 })}
             to="/auctions/$auctionUuid/bets"
           >
             История ставок
@@ -79,6 +83,7 @@ export function AuctionDetailsPage() {
             <Link
               className={buttonClassName('primary')}
               params={{ auctionUuid }}
+              search={(current) => ({ ...current, page: current.page ?? 1 })}
               to="/auctions/$auctionUuid/bet"
             >
               {auction.trading.ownBet === 'Ставки нет'
