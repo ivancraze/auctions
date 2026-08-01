@@ -1,0 +1,35 @@
+.heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+
+  h1 {
+    margin: 6px 0 8px;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.04em;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  color: #1769e0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0;
+  color: #697386;
+}
+
+@media (max-width: 640px) {
+  .heading {
+    align-items: stretch;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+}

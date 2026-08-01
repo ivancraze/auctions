@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ApiContractError, ApiError } from '@/shared/api/client'
 import { auctionApi } from './auctionApi'
+import { ApiContractError, ApiError } from '@/shared/api/client'
 
 afterEach(() => {
   vi.restoreAllMocks()

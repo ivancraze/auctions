@@ -1,0 +1,22 @@
+.card {
+  min-height: 260px;
+  padding: 22px;
+}
+
+.small {
+  width: 130px;
+  height: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 42px;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { createInitialMockData } from '@/mocks/data/fixtures'
 import { mapAuctionDetails } from './mapAuctionDetails'
 import { mapBets } from './mapBets'
+import { createInitialMockData } from '@/mocks/data/fixtures'
 
 describe('auction detail mappers', () => {
   it('removes protected addresses and contacts from the view model', () => {

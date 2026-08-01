@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { AppProviders } from '@/app/providers/AppProviders'
 import { queryClient } from '@/app/providers/queryClient'
 import { router } from '@/app/router/router'
-import { auctionKeys } from '@/entities/auction/api/auctionKeys'
+import { auctionKeys } from '@/entities/auction'
 import { server } from '@/mocks/server'
 
 beforeEach(async () => {

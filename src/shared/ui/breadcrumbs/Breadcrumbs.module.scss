@@ -1,0 +1,12 @@
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+  color: #768094;
+  font-size: 0.8125rem;
+
+  a:hover {
+    color: #1769e0;
+  }
+}

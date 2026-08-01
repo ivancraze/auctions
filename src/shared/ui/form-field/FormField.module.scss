@@ -1,0 +1,26 @@
+.field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: #596579;
+  font-size: 0.8125rem;
+  font-weight: 650;
+
+  input,
+  select {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #d5dce6;
+    border-radius: 9px;
+    color: #172033;
+    background: #ffffff;
+    font: inherit;
+    font-weight: 500;
+
+    &:focus {
+      border-color: #1769e0;
+      outline: 3px solid rgb(23 105 224 / 14%);
+    }
+  }
+}

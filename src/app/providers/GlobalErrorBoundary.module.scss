@@ -1,0 +1,30 @@
+.root {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  place-items: center;
+
+  h1 {
+    margin: 8px 0;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+  }
+}
+
+.card {
+  width: min(620px, 100%);
+}
+
+.details {
+  margin: 20px 0;
+  color: #697386;
+  text-align: left;
+
+  code {
+    display: block;
+    overflow-wrap: anywhere;
+    margin-top: 8px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f4f6f9;
+  }
+}

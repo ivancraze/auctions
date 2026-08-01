@@ -1,5 +1,5 @@
-import type { AuctionListRequest } from '@/entities/auction/model/types'
 import type { AuctionSearch } from './searchSchema'
+import type { AuctionListRequest } from '@/entities/auction'
 
 function toDateTime(value: string | undefined, endOfDay = false) {
   if (!value) return undefined

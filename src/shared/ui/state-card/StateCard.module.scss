@@ -1,0 +1,26 @@
+.card {
+  padding: 36px;
+  border: 1px dashed #cbd3df;
+  border-radius: 18px;
+  text-align: center;
+  background: #ffffff;
+
+  p:not([class]) {
+    color: #697386;
+  }
+}
+
+.error {
+  border-color: #efb4b4;
+  background: #fffafa;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 750;
+}
+
+.card .title {
+  color: #172033;
+}

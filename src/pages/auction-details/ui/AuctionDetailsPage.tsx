@@ -1,21 +1,33 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from '@tanstack/react-router'
 
-import { auctionQueries } from '@/entities/auction/api/auctionQueries'
-import { mapAuctionDetails } from '@/entities/auction/model/mapAuctionDetails'
+import { auctionQueries, mapAuctionDetails } from '@/entities/auction'
 import { ApiError } from '@/shared/api/client'
+import {
+  Badge,
+  BadgeGroup,
+  Breadcrumbs,
+  Button,
+  buttonClassName,
+  Eyebrow,
+  FieldText,
+  Skeleton,
+  StateCard,
+} from '@/shared/ui'
+
+import styles from './AuctionDetailsPage.module.scss'
 
 function DetailSkeleton() {
   return (
     <div
-      className="detail-grid"
+      className={styles.grid}
       aria-busy="true"
       aria-label="Загрузка аукциона"
     >
       {Array.from({ length: 4 }, (_, index) => (
-        <div className="detail-section" key={index}>
-          <span className="skeleton skeleton--title" />
-          <span className="skeleton skeleton--block" />
+        <div className={styles.section} key={index}>
+          <Skeleton variant="title" />
+          <Skeleton variant="block" />
         </div>
       ))}
     </div>
@@ -32,52 +44,50 @@ export function AuctionDetailsPage() {
     const isNotFound =
       detailQuery.error instanceof ApiError && detailQuery.error.status === 404
     return (
-      <section className="state-card state-card--error" role="alert">
+      <StateCard as="section" role="alert" tone="error">
         <h1>
           {isNotFound ? 'Аукцион не найден' : 'Не удалось загрузить аукцион'}
         </h1>
         <p>{detailQuery.error.message}</p>
         <Link
-          className="button button--secondary"
+          className={buttonClassName('secondary')}
           search={{ page: 1 }}
           to="/auctions"
         >
           Вернуться к списку
         </Link>
-      </section>
+      </StateCard>
     )
   }
 
   const auction = mapAuctionDetails(detailQuery.data)
 
   return (
-    <article className="auction-details">
-      <nav className="breadcrumbs" aria-label="Навигационная цепочка">
+    <article>
+      <Breadcrumbs>
         <Link search={{ page: 1 }} to="/auctions">
           Аукционы
         </Link>
         <span>→</span>
         <span>Заявка № {auction.cargoNumber}</span>
-      </nav>
+      </Breadcrumbs>
 
-      <header className="detail-hero">
+      <header className={styles.hero}>
         <div>
-          <p className="eyebrow">Заявка № {auction.cargoNumber}</p>
+          <Eyebrow>Заявка № {auction.cargoNumber}</Eyebrow>
           <h1>
             {auction.routes[0]?.city ?? 'Погрузка'} →{' '}
             {auction.routes.at(-1)?.city ?? 'Выгрузка'}
           </h1>
-          <div className="auction-card__badges">
-            <span className="status-badge status-badge--active">
-              {auction.status}
-            </span>
-            <span className="type-badge">{auction.type}</span>
-          </div>
+          <BadgeGroup>
+            <Badge tone="active">{auction.status}</Badge>
+            <Badge tone="type">{auction.type}</Badge>
+          </BadgeGroup>
         </div>
-        <div className="detail-actions">
+        <div className={styles.actions}>
           {!auction.hideBetsHistory ? (
             <Link
-              className="button button--secondary"
+              className={buttonClassName('secondary')}
               params={{ auctionUuid }}
               to="/auctions/$auctionUuid/bets"
             >
@@ -86,7 +96,7 @@ export function AuctionDetailsPage() {
           ) : null}
           {auction.canSetBet ? (
             <Link
-              className="button button--primary"
+              className={buttonClassName('primary')}
               params={{ auctionUuid }}
               to="/auctions/$auctionUuid/bet"
             >
@@ -95,14 +105,14 @@ export function AuctionDetailsPage() {
                 : 'Изменить ставку'}
             </Link>
           ) : (
-            <button className="button button--disabled" disabled type="button">
+            <Button disabled type="button" variant="disabled">
               Ставка недоступна
-            </button>
+            </Button>
           )}
         </div>
       </header>
 
-      <div className="restriction-list">
+      <div className={styles.restrictions}>
         {auction.hideContacts ? (
           <p>Точные адреса и контакты скрыты организатором.</p>
         ) : null}
@@ -114,21 +124,23 @@ export function AuctionDetailsPage() {
         ) : null}
       </div>
 
-      <div className="detail-grid">
-        <section className="detail-section detail-section--wide">
+      <div className={styles.grid}>
+        <section className={`${styles.section} ${styles.wide}`}>
           <h2>Маршрут</h2>
-          <ol className="route-timeline">
+          <ol className={styles.timeline}>
             {auction.routes.map((route) => (
               <li key={route.key}>
-                <span className="route-timeline__marker" />
+                <span className={styles.timelineMarker} />
                 <div>
-                  <p className="field-label">{route.operation}</p>
+                  <FieldText variant="label">{route.operation}</FieldText>
                   <h3>{route.city}</h3>
                   {route.address ? <p>{route.address}</p> : null}
-                  <p className="field-note">{route.interval}</p>
-                  <p className="field-note">{route.cargo}</p>
+                  <FieldText variant="note">{route.interval}</FieldText>
+                  <FieldText variant="note">{route.cargo}</FieldText>
                   {route.contact ? (
-                    <p className="field-note">Контакт: {route.contact}</p>
+                    <FieldText variant="note">
+                      Контакт: {route.contact}
+                    </FieldText>
                   ) : null}
                 </div>
               </li>
@@ -136,9 +148,9 @@ export function AuctionDetailsPage() {
           </ol>
         </section>
 
-        <section className="detail-section">
+        <section className={styles.section}>
           <h2>Торги</h2>
-          <dl className="details-list">
+          <dl className={styles.detailsList}>
             <div>
               <dt>Ваш статус</dt>
               <dd>{auction.userStatus}</dd>
@@ -184,9 +196,9 @@ export function AuctionDetailsPage() {
           </dl>
         </section>
 
-        <section className="detail-section">
+        <section className={styles.section}>
           <h2>Груз и транспорт</h2>
-          <dl className="details-list">
+          <dl className={styles.detailsList}>
             <div>
               <dt>Груз</dt>
               <dd>{auction.cargo.name}</dd>
@@ -210,9 +222,9 @@ export function AuctionDetailsPage() {
           </dl>
         </section>
 
-        <section className="detail-section">
+        <section className={styles.section}>
           <h2>Организатор</h2>
-          <dl className="details-list">
+          <dl className={styles.detailsList}>
             <div>
               <dt>Организация</dt>
               <dd>{auction.organizer.name}</dd>
@@ -227,7 +239,7 @@ export function AuctionDetailsPage() {
             </div>
           </dl>
           {!auction.hideContacts ? (
-            <div className="contacts-list">
+            <div className={styles.contacts}>
               {auction.contacts.length ? (
                 auction.contacts.map((contact, index) => (
                   <div key={`${contact.phone}-${index}`}>
@@ -237,15 +249,15 @@ export function AuctionDetailsPage() {
                   </div>
                 ))
               ) : (
-                <p className="field-note">Контакты не указаны</p>
+                <FieldText variant="note">Контакты не указаны</FieldText>
               )}
             </div>
           ) : null}
         </section>
 
-        <section className="detail-section">
+        <section className={styles.section}>
           <h2>Условия оплаты</h2>
-          <dl className="details-list">
+          <dl className={styles.detailsList}>
             <div>
               <dt>Форма</dt>
               <dd>{auction.payment.form}</dd>

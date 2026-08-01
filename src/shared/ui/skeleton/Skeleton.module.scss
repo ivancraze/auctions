@@ -1,0 +1,23 @@
+.skeleton {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #edf0f4 25%, #f7f8fa 50%, #edf0f4 75%);
+  background-size: 200% 100%;
+  animation: loading 1.35s infinite;
+}
+
+.title {
+  width: min(420px, 72%);
+  height: 28px;
+  margin-top: 12px;
+}
+
+.block {
+  height: 100px;
+}
+
+@keyframes loading {
+  to {
+    background-position-x: -200%;
+  }
+}

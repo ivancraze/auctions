@@ -1,9 +1,3 @@
-import { apiRequest, apiRequestVoid } from '@/shared/api/client'
-import {
-  auctionDetailsResponseSchema,
-  auctionListResponseSchema,
-  betListResponseSchema,
-} from '@/shared/api/responseSchemas'
 import type {
   AuctionDetails,
   AuctionListRequest,
@@ -11,6 +5,12 @@ import type {
   BetListResponse,
   SetBetRequest,
 } from '../model/types'
+import { apiRequest, apiRequestVoid } from '@/shared/api/client'
+import {
+  auctionDetailsResponseSchema,
+  auctionListResponseSchema,
+  betListResponseSchema,
+} from '@/shared/api/responseSchemas'
 
 export const auctionApi = {
   list(request: AuctionListRequest = {}, signal?: AbortSignal) {

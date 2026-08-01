@@ -2,7 +2,7 @@ import type {
   AuctionDetails,
   AuctionListItem,
   BetItem,
-} from '@/entities/auction/model/types'
+} from '@/entities/auction'
 
 type AuctionType = NonNullable<AuctionListItem['main']>['auc_type']
 type AuctionStatus = NonNullable<AuctionListItem['trading']>['status']

@@ -2,7 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { AppProviders } from '@/app/providers/AppProviders'
-import '@/app/styles/index.css'
+
+import '@/app/styles/global.scss'
 
 async function enableMocking() {
   if (!import.meta.env.DEV) return

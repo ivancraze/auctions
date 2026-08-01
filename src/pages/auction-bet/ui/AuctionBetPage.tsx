@@ -3,16 +3,25 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 
-import { auctionApi } from '@/entities/auction/api/auctionApi'
-import { auctionKeys } from '@/entities/auction/api/auctionKeys'
-import { auctionQueries } from '@/entities/auction/api/auctionQueries'
-import type { AuctionDetails } from '@/entities/auction/model/types'
 import {
-  createBetSchema,
-  type BetFormValues,
-} from '@/features/set-auction-bet/model/betSchema'
+  auctionApi,
+  type AuctionDetails,
+  auctionKeys,
+  auctionQueries,
+} from '@/entities/auction'
+import { type BetFormValues, createBetSchema } from '@/features/set-auction-bet'
 import { ApiError } from '@/shared/api/client'
-import { useToastStore } from '@/shared/ui/toast/toastStore'
+import {
+  Breadcrumbs,
+  Button,
+  buttonClassName,
+  Eyebrow,
+  FormFieldGroup,
+  StateCard,
+  useToastStore,
+} from '@/shared/ui'
+
+import styles from './AuctionBetPage.module.scss'
 
 const moneyFormatter = new Intl.NumberFormat('ru-RU', {
   style: 'currency',
@@ -104,11 +113,11 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
 
   return (
     <form
-      className="bet-form"
+      className={styles.form}
       noValidate
       onSubmit={(event) => void submit(event)}
     >
-      <div className="bet-summary">
+      <div className={styles.summary}>
         <div>
           <span>Текущая цена</span>
           <strong>{formatMoney(constraints?.current)}</strong>
@@ -123,9 +132,9 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
         </div>
       </div>
 
-      <div className="form-field bet-form__field">
+      <FormFieldGroup>
         <label htmlFor="bet-price">Цена ставки</label>
-        <div className="price-input">
+        <div className={styles.priceInput}>
           <input
             id="bet-price"
             aria-invalid={errors.price ? 'true' : 'false'}
@@ -138,31 +147,27 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
           <span>₽</span>
         </div>
         {errors.price ? (
-          <span className="form-error">{errors.price.message}</span>
+          <span className={styles.error}>{errors.price.message}</span>
         ) : null}
-      </div>
+      </FormFieldGroup>
 
-      <div className="bet-limits">
+      <div className={styles.limits}>
         <span>Минимум: {formatMoney(constraints?.min)}</span>
         <span>Максимум: {formatMoney(constraints?.max)}</span>
       </div>
 
       {errors.root?.server ? (
-        <p className="form-error" role="alert">
+        <p className={styles.error} role="alert">
           {errors.root.server.message}
         </p>
       ) : null}
 
-      <div className="bet-form__actions">
-        <button
-          className="button button--primary"
-          disabled={mutation.isPending}
-          type="submit"
-        >
+      <div className={styles.actions}>
+        <Button disabled={mutation.isPending} type="submit">
           {mutation.isPending ? 'Отправляем…' : 'Подтвердить ставку'}
-        </button>
+        </Button>
         <Link
-          className="button button--secondary"
+          className={buttonClassName('secondary')}
           params={{ auctionUuid }}
           to="/auctions/$auctionUuid"
         >
@@ -178,44 +183,40 @@ export function AuctionBetPage() {
   const detailQuery = useQuery(auctionQueries.detail(auctionUuid))
 
   if (detailQuery.isPending) {
-    return (
-      <div className="state-card" aria-busy="true">
-        Загрузка параметров ставки…
-      </div>
-    )
+    return <StateCard aria-busy="true">Загрузка параметров ставки…</StateCard>
   }
 
   if (detailQuery.isError) {
     return (
-      <div className="state-card state-card--error" role="alert">
+      <StateCard role="alert" tone="error">
         <h1>Не удалось загрузить аукцион</h1>
         <p>{detailQuery.error.message}</p>
-      </div>
+      </StateCard>
     )
   }
 
   if (!detailQuery.data.trading.can_set_bet) {
     return (
-      <section className="state-card">
-        <p className="eyebrow">
+      <StateCard as="section">
+        <Eyebrow>
           Заявка № {detailQuery.data.main.cargo_num ?? 'Без номера'}
-        </p>
+        </Eyebrow>
         <h1>Ставка недоступна</h1>
         <p>Текущее состояние торгов не позволяет установить ставку.</p>
         <Link
-          className="button button--secondary"
+          className={buttonClassName('secondary')}
           params={{ auctionUuid }}
           to="/auctions/$auctionUuid"
         >
           Вернуться к аукциону
         </Link>
-      </section>
+      </StateCard>
     )
   }
 
   return (
-    <section className="bet-page">
-      <nav className="breadcrumbs" aria-label="Навигационная цепочка">
+    <section>
+      <Breadcrumbs>
         <Link search={{ page: 1 }} to="/auctions">
           Аукционы
         </Link>
@@ -225,10 +226,10 @@ export function AuctionBetPage() {
         </Link>
         <span>→</span>
         <span>Ставка</span>
-      </nav>
-      <div className="bet-panel">
+      </Breadcrumbs>
+      <div className={styles.panel}>
         <header>
-          <p className="eyebrow">Участие в торгах</p>
+          <Eyebrow>Участие в торгах</Eyebrow>
           <h1>
             {detailQuery.data.trading.your?.bet
               ? 'Изменить ставку'

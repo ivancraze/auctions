@@ -1,9 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 
-import { auctionQueries } from '@/entities/auction/api/auctionQueries'
-import { mapBets } from '@/entities/auction/model/mapBets'
+import { auctionQueries, mapBets } from '@/entities/auction'
 import { ApiError } from '@/shared/api/client'
+import {
+  Badge,
+  Breadcrumbs,
+  buttonClassName,
+  Eyebrow,
+  PageHeading,
+  PageSubtitle,
+  StateCard,
+  StateCardTitle,
+} from '@/shared/ui'
+
+import styles from './AuctionBetsPage.module.scss'
 
 export function AuctionBetsPage() {
   const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid/bets' })
@@ -20,23 +31,19 @@ export function AuctionBetsPage() {
   })
 
   if (detailQuery.isPending || (!isHidden && betsQuery.isPending)) {
-    return (
-      <div className="state-card" aria-busy="true">
-        Загрузка истории ставок…
-      </div>
-    )
+    return <StateCard aria-busy="true">Загрузка истории ставок…</StateCard>
   }
 
   const error = detailQuery.error ?? betsQuery.error
   if (error) {
     const isNotFound = error instanceof ApiError && error.status === 404
     return (
-      <div className="state-card state-card--error" role="alert">
+      <StateCard role="alert" tone="error">
         <h1>
           {isNotFound ? 'Аукцион не найден' : 'Не удалось загрузить ставки'}
         </h1>
         <p>{error.message}</p>
-      </div>
+      </StateCard>
     )
   }
 
@@ -44,26 +51,26 @@ export function AuctionBetsPage() {
 
   if (isHidden) {
     return (
-      <section className="state-card">
-        <p className="eyebrow">Заявка № {cargoNumber}</p>
+      <StateCard as="section">
+        <Eyebrow>Заявка № {cargoNumber}</Eyebrow>
         <h1>История ставок скрыта</h1>
         <p>Организатор ограничил просмотр ставок этого аукциона.</p>
         <Link
-          className="button button--secondary"
+          className={buttonClassName('secondary')}
           params={{ auctionUuid }}
           to="/auctions/$auctionUuid"
         >
           Вернуться к аукциону
         </Link>
-      </section>
+      </StateCard>
     )
   }
 
   const bets = mapBets(betsQuery.data?.bets ?? [])
 
   return (
-    <section className="bets-page">
-      <nav className="breadcrumbs" aria-label="Навигационная цепочка">
+    <section>
+      <Breadcrumbs>
         <Link search={{ page: 1 }} to="/auctions">
           Аукционы
         </Link>
@@ -73,14 +80,14 @@ export function AuctionBetsPage() {
         </Link>
         <span>→</span>
         <span>Ставки</span>
-      </nav>
-      <header className="page-heading">
+      </Breadcrumbs>
+      <PageHeading>
         <div>
-          <p className="eyebrow">Заявка № {cargoNumber}</p>
+          <Eyebrow>Заявка № {cargoNumber}</Eyebrow>
           <h1>История ставок</h1>
-          <p className="page-subtitle">Участников: {bets.participants}</p>
+          <PageSubtitle>Участников: {bets.participants}</PageSubtitle>
         </div>
-        <label className="all-bets-toggle">
+        <label className={styles.toggle}>
           <input
             checked={search.all ?? false}
             onChange={(event) =>
@@ -92,16 +99,16 @@ export function AuctionBetsPage() {
           />
           Показывать отменённые
         </label>
-      </header>
+      </PageHeading>
 
       {bets.rows.length === 0 ? (
-        <div className="state-card">
-          <p className="state-card__title">Ставок пока нет</p>
+        <StateCard>
+          <StateCardTitle>Ставок пока нет</StateCardTitle>
           <p>Будьте первым участником аукциона.</p>
-        </div>
+        </StateCard>
       ) : (
-        <div className="bets-table-wrap">
-          <table className="bets-table">
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
             <thead>
               <tr>
                 <th>Перевозчик</th>
@@ -115,7 +122,7 @@ export function AuctionBetsPage() {
             <tbody>
               {bets.rows.map((bet) => (
                 <tr
-                  className={bet.isCanceled ? 'bets-table__row--canceled' : ''}
+                  className={bet.isCanceled ? styles.canceled : undefined}
                   key={bet.id}
                 >
                   <td>
@@ -128,9 +135,7 @@ export function AuctionBetsPage() {
                   <td>{bet.createdAt}</td>
                   <td>
                     {bet.isWinner ? (
-                      <span className="status-badge status-badge--success">
-                        Победитель
-                      </span>
+                      <Badge tone="success">Победитель</Badge>
                     ) : bet.isCanceled ? (
                       <span title={bet.cancelReason ?? undefined}>
                         Отменена

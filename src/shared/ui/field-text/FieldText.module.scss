@@ -1,0 +1,31 @@
+.label,
+.note {
+  margin: 0;
+  color: #768094;
+  font-size: 0.8125rem;
+}
+
+.spaced {
+  margin-top: 14px;
+}
+
+.value,
+.priceValue,
+.userStatus {
+  margin: 4px 0 0;
+  font-weight: 650;
+}
+
+.note {
+  margin-top: 6px;
+  line-height: 1.45;
+}
+
+.priceValue {
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.userStatus {
+  font-size: 0.9375rem;
+}

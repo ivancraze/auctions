@@ -1,0 +1,41 @@
+.toast {
+  position: fixed;
+  z-index: 50;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 16px 38px rgb(16 24 40 / 22%);
+  font-size: 0.875rem;
+  font-weight: 650;
+
+  button {
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+}
+
+.success {
+  background: #087a4d;
+}
+
+.error {
+  background: #b4232d;
+}
+
+@media (max-width: 640px) {
+  .toast {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+  }
+}

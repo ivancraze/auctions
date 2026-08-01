@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 
 import { useToastStore } from './toastStore'
 
+import styles from './ToastViewport.module.scss'
+
 export function ToastViewport() {
   const toast = useToastStore((state) => state.toast)
   const dismiss = useToastStore((state) => state.dismiss)
@@ -14,8 +16,10 @@ export function ToastViewport() {
 
   if (!toast) return null
 
+  const kindClass = toast.kind === 'success' ? styles.success : styles.error
+
   return (
-    <div className={`toast toast--${toast.kind}`} role="status">
+    <div className={`${styles.toast} ${kindClass}`} role="status">
       <span>{toast.text}</span>
       <button aria-label="Закрыть уведомление" onClick={dismiss} type="button">
         ×

@@ -1,0 +1,41 @@
+.button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  color: #ffffff;
+  background: #1769e0;
+
+  &:hover {
+    background: #0f57be;
+  }
+}
+
+.secondary {
+  border: 1px solid #d5dce6;
+  color: #253149;
+  background: #ffffff;
+}
+
+.disabled {
+  color: #98a1b1;
+  background: #edf0f4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .button {
+    width: 100%;
+  }
+}

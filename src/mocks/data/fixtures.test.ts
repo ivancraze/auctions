@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { createInitialMockData } from './fixtures'
 import {
   auctionDetailsResponseSchema,
   auctionListResponseSchema,
   betListResponseSchema,
 } from '@/shared/api/responseSchemas'
-import { createInitialMockData } from './fixtures'
 
 describe('auction fixtures', () => {
   it('covers all auction, type and user status enum values', () => {

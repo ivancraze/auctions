@@ -1,0 +1,44 @@
+.badge,
+.type {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.active {
+  color: #075b3a;
+  background: #dcf8e9;
+}
+
+.neutral,
+.type {
+  color: #4f5b6d;
+  background: #edf1f5;
+}
+
+.danger {
+  color: #9e2a2b;
+  background: #fde8e8;
+}
+
+.success {
+  color: #255aa5;
+  background: #e3edff;
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .group {
+    justify-content: flex-start;
+  }
+}

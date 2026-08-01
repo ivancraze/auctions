@@ -5,36 +5,41 @@ import {
 } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 
-import { auctionQueries } from '@/entities/auction/api/auctionQueries'
-import { mapAuctionCard } from '@/entities/auction/model/mapAuctionCard'
-import { AuctionCard } from '@/entities/auction/ui/AuctionCard'
-import { buildAuctionListRequest } from '@/features/filter-auctions/model/buildAuctionListRequest'
 import {
+  AuctionCard,
+  AuctionCardSkeleton,
+  auctionQueries,
+  mapAuctionCard,
+} from '@/entities/auction'
+import {
+  AuctionFilters,
   auctionSearchSchema,
+  buildAuctionListRequest,
   defaultAuctionSearch,
-} from '@/features/filter-auctions/model/searchSchema'
-import { AuctionFilters } from '@/features/filter-auctions/ui/AuctionFilters'
+} from '@/features/filter-auctions'
 import { ApiError } from '@/shared/api/client'
+import {
+  Button,
+  Eyebrow,
+  PageHeading,
+  PageSubtitle,
+  StateCard,
+  StateCardTitle,
+} from '@/shared/ui'
+
+import styles from './AuctionsListPage.module.scss'
 
 const PER_PAGE = 3
 
 function AuctionsSkeleton() {
   return (
     <div
-      className="auction-list"
+      className={styles.list}
       aria-label="Загрузка аукционов"
       aria-busy="true"
     >
       {Array.from({ length: PER_PAGE }, (_, index) => (
-        <div className="auction-card auction-card--skeleton" key={index}>
-          <span className="skeleton skeleton--small" />
-          <span className="skeleton skeleton--title" />
-          <div className="skeleton-grid">
-            <span className="skeleton skeleton--block" />
-            <span className="skeleton skeleton--block" />
-            <span className="skeleton skeleton--block" />
-          </div>
-        </div>
+        <AuctionCardSkeleton key={index} />
       ))}
     </div>
   )
@@ -42,8 +47,8 @@ function AuctionsSkeleton() {
 
 function AuctionsLoader() {
   return (
-    <div className="auctions-loader" role="status" aria-live="polite">
-      <span className="auctions-loader__spinner" aria-hidden="true" />
+    <div className={styles.loader} role="status" aria-live="polite">
+      <span className={styles.spinner} aria-hidden="true" />
       <span>Обновляем аукционы…</span>
     </div>
   )
@@ -75,62 +80,62 @@ export function AuctionsListPage() {
   const page = search.page
 
   return (
-    <section className="auctions-page">
-      <header className="page-heading">
+    <section>
+      <PageHeading>
         <div>
-          <p className="eyebrow">Грузовые перевозки</p>
+          <Eyebrow>Грузовые перевозки</Eyebrow>
           <h1>Аукционы</h1>
-          <p className="page-subtitle">
+          <PageSubtitle>
             Актуальные заявки на перевозку и ваши позиции в торгах
-          </p>
+          </PageSubtitle>
         </div>
         {meta ? (
-          <p className="result-count">
+          <p className={styles.resultCount}>
             Найдено: <strong>{meta.total ?? 0}</strong>
           </p>
         ) : null}
-      </header>
+      </PageHeading>
 
-      <div className="auctions-layout">
+      <div className={styles.layout}>
         <AuctionFilters
           values={search}
           onApply={updateSearch}
           onReset={() => updateSearch(defaultAuctionSearch)}
         />
 
-        <div className="auctions-content" aria-busy={isUpdating}>
+        <div className={styles.content} aria-busy={isUpdating}>
           {listQuery.isPending ? <AuctionsSkeleton /> : null}
 
           {isUpdating ? <AuctionsLoader /> : null}
 
           {listQuery.isError && !isUpdating ? (
-            <div className="state-card state-card--error" role="alert">
-              <p className="state-card__title">Не удалось загрузить аукционы</p>
+            <StateCard role="alert" tone="error">
+              <StateCardTitle>Не удалось загрузить аукционы</StateCardTitle>
               <p>
                 {listQuery.error instanceof ApiError
                   ? listQuery.error.problem.message
                   : listQuery.error.message}
               </p>
-              <button
-                className="button button--secondary"
+              <Button
                 onClick={() => void listQuery.refetch()}
                 type="button"
+                variant="secondary"
               >
                 Повторить
-              </button>
-            </div>
+              </Button>
+            </StateCard>
           ) : null}
 
           {listQuery.isSuccess && !isUpdating && items.length === 0 ? (
-            <div className="state-card">
-              <p className="state-card__title">Аукционы не найдены</p>
+            <StateCard>
+              <StateCardTitle>Аукционы не найдены</StateCardTitle>
               <p>Попробуйте изменить условия поиска.</p>
-            </div>
+            </StateCard>
           ) : null}
 
           {listQuery.isSuccess && !isUpdating && items.length > 0 ? (
             <>
-              <div className="auction-list">
+              <div className={styles.list}>
                 {items.map((item, index) => {
                   const viewModel = mapAuctionCard(item)
                   return (
@@ -145,9 +150,12 @@ export function AuctionsListPage() {
                 })}
               </div>
 
-              <nav className="pagination" aria-label="Пагинация аукционов">
+              <nav
+                className={styles.pagination}
+                aria-label="Пагинация аукционов"
+              >
                 <button
-                  className="pagination__button"
+                  className={styles.paginationButton}
                   disabled={page <= 1 || isUpdating}
                   onClick={() =>
                     updateSearch({ ...search, page: Math.max(1, page - 1) })
@@ -156,12 +164,12 @@ export function AuctionsListPage() {
                 >
                   ← Назад
                 </button>
-                <span className="pagination__status">
+                <span className={styles.paginationStatus}>
                   Страница <strong>{page}</strong> из{' '}
                   <strong>{lastPage}</strong>
                 </span>
                 <button
-                  className="pagination__button"
+                  className={styles.paginationButton}
                   disabled={page >= lastPage || isUpdating}
                   onClick={() => updateSearch({ ...search, page: page + 1 })}
                   type="button"

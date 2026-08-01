@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 
 import { server } from '@/mocks/server'
 import { resetMockStore } from '@/mocks/store'
-import { useToastStore } from '@/shared/ui/toast/toastStore'
+import { useToastStore } from '@/shared/ui'
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 afterEach(() => {

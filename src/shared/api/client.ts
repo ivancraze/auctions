@@ -1,6 +1,6 @@
-import type { components } from './generated/schema'
 import type { ZodIssue, ZodTypeAny } from 'zod'
 
+import type { components } from './generated/schema'
 import { apiProblemSchema } from './responseSchemas'
 
 const API_BASE_URL = '/api/v1'

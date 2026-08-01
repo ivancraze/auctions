@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
 import { constants } from 'node:zlib'
 import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'node:url'
 import { compression, defineAlgorithm } from 'vite-plugin-compression2'
 
 export default defineConfig({

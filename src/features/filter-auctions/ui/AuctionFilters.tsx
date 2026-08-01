@@ -2,13 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLayoutEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { mockCities } from '@/shared/config/cities'
 import { useFilterUiStore } from '../model/filterUiStore'
 import {
-  auctionSearchSchema,
   type AuctionSearch,
   type AuctionSearchInput,
+  auctionSearchSchema,
 } from '../model/searchSchema'
+import { mockCities } from '@/shared/config/cities'
+import { Button, FormField } from '@/shared/ui'
+
+import styles from './AuctionFilters.module.scss'
 
 interface AuctionFiltersProps {
   values: AuctionSearch
@@ -89,40 +92,40 @@ export function AuctionFilters({
 
   return (
     <>
-      <button className="filter-trigger" onClick={open} type="button">
+      <button className={styles.trigger} onClick={open} type="button">
         Фильтры
       </button>
       {isOpen ? (
         <button
           aria-label="Закрыть фильтры"
-          className="filter-backdrop"
+          className={styles.backdrop}
           onClick={close}
           type="button"
         />
       ) : null}
       <aside
-        className={`filters-panel ${isOpen ? 'filters-panel--open' : ''}`}
+        className={`${styles.panel} ${isOpen ? styles.open : ''}`}
         ref={panelRef}
       >
-        <div className="filters-panel__heading">
+        <div className={styles.heading}>
           <h2>Фильтры</h2>
           <button
             aria-label="Закрыть фильтры"
-            className="filters-panel__close"
+            className={styles.close}
             onClick={close}
             type="button"
           >
             ×
           </button>
         </div>
-        <form className="filters-form" onSubmit={(event) => void submit(event)}>
-          <div className="filters-form__fields">
-            <label className="form-field">
+        <form className={styles.form} onSubmit={(event) => void submit(event)}>
+          <div className={styles.fields}>
+            <FormField>
               <span>Номер заявки</span>
               <input placeholder="00000001001" {...register('cargo_num')} />
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Ваш статус</span>
               <select {...register('status', { setValueAs: emptyToUndefined })}>
                 <option value="">Любой</option>
@@ -132,9 +135,9 @@ export function AuctionFilters({
                 <option value="Winner">Победитель</option>
                 <option value="Confirmed">Подтверждён</option>
               </select>
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Статус аукциона</span>
               <select {...register('statuses', { setValueAs: stringToNumber })}>
                 <option value="">Любой</option>
@@ -144,9 +147,9 @@ export function AuctionFilters({
                 <option value="6">Завершён</option>
                 <option value="8">Отменён</option>
               </select>
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Тип аукциона</span>
               <select
                 {...register('auc_type', { setValueAs: emptyToUndefined })}
@@ -157,9 +160,9 @@ export function AuctionFilters({
                 <option value="Down">На понижение</option>
                 <option value="FixPrice">Фиксированная цена</option>
               </select>
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Город погрузки</span>
               <select
                 {...register('load_city', { setValueAs: emptyToUndefined })}
@@ -171,9 +174,9 @@ export function AuctionFilters({
                   </option>
                 ))}
               </select>
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Город выгрузки</span>
               <select
                 {...register('unload_city', { setValueAs: emptyToUndefined })}
@@ -185,20 +188,20 @@ export function AuctionFilters({
                   </option>
                 ))}
               </select>
-            </label>
+            </FormField>
 
-            <div className="form-row">
-              <label className="form-field">
+            <div className={styles.row}>
+              <FormField>
                 <span>Погрузка от</span>
                 <input type="date" {...register('load_date_from')} />
-              </label>
-              <label className="form-field">
+              </FormField>
+              <FormField>
                 <span>Погрузка до</span>
                 <input type="date" {...register('load_date_to')} />
-              </label>
+              </FormField>
             </div>
 
-            <label className="form-field">
+            <FormField>
               <span>Доступность ставки</span>
               <select
                 {...register('is_available', { setValueAs: stringToBoolean })}
@@ -207,9 +210,9 @@ export function AuctionFilters({
                 <option value="true">Ставка доступна</option>
                 <option value="false">Ставка недоступна</option>
               </select>
-            </label>
+            </FormField>
 
-            <label className="form-field">
+            <FormField>
               <span>Участие</span>
               <select
                 {...register('is_bidder', { setValueAs: stringToBoolean })}
@@ -218,10 +221,10 @@ export function AuctionFilters({
                 <option value="true">Участвую</option>
                 <option value="false">Не участвую</option>
               </select>
-            </label>
+            </FormField>
 
-            <div className="form-row">
-              <label className="form-field">
+            <div className={styles.row}>
+              <FormField>
                 <span>Цена от</span>
                 <input
                   min="0"
@@ -231,8 +234,8 @@ export function AuctionFilters({
                     setValueAs: stringToNumber,
                   })}
                 />
-              </label>
-              <label className="form-field">
+              </FormField>
+              <FormField>
                 <span>Цена до</span>
                 <input
                   min="0"
@@ -242,24 +245,22 @@ export function AuctionFilters({
                     setValueAs: stringToNumber,
                   })}
                 />
-              </label>
+              </FormField>
             </div>
           </div>
 
-          <div className="filters-form__actions">
-            <button className="button button--primary" type="submit">
-              Применить
-            </button>
-            <button
-              className="button button--secondary"
+          <div className={styles.actions}>
+            <Button type="submit">Применить</Button>
+            <Button
               onClick={() => {
                 onReset()
                 close()
               }}
               type="button"
+              variant="secondary"
             >
               Сбросить
-            </button>
+            </Button>
           </div>
         </form>
       </aside>

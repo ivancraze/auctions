@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse } from 'msw'
 
+import { mockStore } from './store'
 import type {
   AuctionDetails,
   AuctionListItem,
@@ -8,8 +9,7 @@ import type {
   ProblemDetail,
   SetBetRequest,
   ValidationProblem,
-} from '@/entities/auction/model/types'
-import { mockStore } from './store'
+} from '@/entities/auction'
 
 const API_URL = '/api/v1'
 const AUCTION_LIST_DELAY_MS = 700

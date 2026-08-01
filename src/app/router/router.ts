@@ -6,10 +6,10 @@ import {
 } from '@tanstack/react-router'
 
 import { RootLayout } from '../layout/RootLayout'
-import { auctionSearchSchema } from '@/features/filter-auctions/model/searchSchema'
-import { betsSearchSchema } from '@/features/view-auction-bets/model/betsSearchSchema'
-import { AuctionBetsPage } from '@/pages/auction-bets/ui/AuctionBetsPage'
+import { auctionSearchSchema } from '@/features/filter-auctions'
+import { betsSearchSchema } from '@/features/view-auction-bets'
 import { AuctionBetPage } from '@/pages/auction-bet/ui/AuctionBetPage'
+import { AuctionBetsPage } from '@/pages/auction-bets/ui/AuctionBetsPage'
 import { AuctionDetailsPage } from '@/pages/auction-details/ui/AuctionDetailsPage'
 import { AuctionsListPage } from '@/pages/auctions-list/ui/AuctionsListPage'
 
