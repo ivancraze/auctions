@@ -18,7 +18,8 @@
     "generate:api": "npm run generate:api:types && npm run generate:api:zod",
     "generate:api:types": "openapi-typescript openapi.auctions.v0.json -o src/shared/api/generated/schema.ts && prettier --write src/shared/api/generated/schema.ts",
     "generate:api:zod": "orval --config orval.config.ts && prettier --write src/shared/api/generated/zod.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.5.7",
@@ -39,6 +40,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",

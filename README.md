@@ -21,6 +21,7 @@ npm run typecheck  # проверка TypeScript
 npm run lint       # ESLint
 npm run format     # форматирование Prettier
 npm run build      # production-сборка
+npm run test:coverage # тесты и отчёт о покрытии в терминале и coverage/index.html
 npm run generate:api # повторная генерация TypeScript-типов и Zod-схем
 ```
 
@@ -83,6 +84,7 @@ npm run typecheck
 npm run lint
 npm run format:check
 npm test
+npm run test:coverage
 npm run build
 ```
 

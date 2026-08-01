@@ -34,6 +34,17 @@ describe('auction MSW handlers', () => {
   })
 
   it('updates list, detail and bets after setting a bet', async () => {
+    const [detailBefore, betsBefore] = await Promise.all([
+      auctionApi.getByUuid(availableAuctionUuid),
+      auctionApi.getBets(availableAuctionUuid),
+    ])
+
+    expect(detailBefore.trading.price).toMatchObject({
+      current: 120000,
+      available: 119000,
+    })
+    expect(detailBefore.trading.status_mobile).toBe('NotParticipating')
+
     await auctionApi.setBet(availableAuctionUuid, { price: 119000 })
 
     const [detail, list, bets] = await Promise.all([
@@ -42,29 +53,85 @@ describe('auction MSW handlers', () => {
       auctionApi.getBets(availableAuctionUuid),
     ])
 
-    expect(detail.trading.price?.current).toBe(119000)
+    expect(detail.trading.price).toMatchObject({
+      current: 119000,
+      available: 118000,
+    })
+    expect(detail.trading.price?.available_no_vat).toBeCloseTo(118000 / 1.2)
     expect(detail.trading.status_mobile).toBe('Leading')
-    expect(detail.trading.your?.bet).toBe(true)
+    expect(detail.trading.is_bidder).toBe(true)
+    expect(detail.trading.your).toMatchObject({
+      bet: true,
+      last_bet: 119000,
+      last_bet_with_vat: 119000,
+      win: false,
+    })
     expect(list.data?.[0]?.trading?.price?.current).toBe(119000)
+    expect(list.data?.[0]?.trading?.status_mobile).toBe('Leading')
     expect(list.data?.[0]?.trading?.is_bidder).toBe(true)
+    expect(list.data?.[0]?.trading?.your).toMatchObject({
+      bet: true,
+      last_bet: 119000,
+    })
+    expect(bets.bets).toHaveLength(betsBefore.bets.length + 1)
     expect(bets.bets[0]).toMatchObject({
       price_with_vat: 119000,
+      price_no_vat: 119000 / 1.2,
       organization_name: 'ООО Моя компания',
+      is_rejected: false,
     })
   })
 
-  it('returns a contract-shaped 422 for an invalid step', async () => {
-    const result = auctionApi.setBet(availableAuctionUuid, { price: 119500 })
+  it.each([
+    [-1000, 'min_value'],
+    [0, 'min_value'],
+    [9000, 'min_value'],
+    [301000, 'max_value'],
+    [119500, 'invalid_step'],
+  ])(
+    'returns a contract-shaped 422 for invalid price %s',
+    async (price, code) => {
+      const result = auctionApi.setBet(availableAuctionUuid, { price })
 
-    await expect(result).rejects.toBeInstanceOf(ApiError)
+      await expect(result).rejects.toBeInstanceOf(ApiError)
+      await expect(result).rejects.toMatchObject({
+        status: 422,
+        problem: {
+          code: 'validation_failed',
+          errors: [expect.objectContaining({ field: 'price', code })],
+        },
+      })
+    },
+  )
+
+  it('rejects a bet when the auction does not allow bidding', async () => {
+    const result = auctionApi.setBet('550e8400-e29b-41d4-a716-446655440003', {
+      price: 74000,
+    })
+
     await expect(result).rejects.toMatchObject({
       status: 422,
       problem: {
-        code: 'validation_failed',
         errors: [
-          expect.objectContaining({ field: 'price', code: 'invalid_step' }),
+          expect.objectContaining({
+            field: 'price',
+            code: 'bet_not_allowed',
+          }),
         ],
       },
+    })
+  })
+
+  it('returns a required validation error for an empty request body', async () => {
+    const response = await fetch(
+      `/api/v1/auctions/${availableAuctionUuid}/bets`,
+      { method: 'POST' },
+    )
+
+    expect(response.status).toBe(422)
+    await expect(response.json()).resolves.toMatchObject({
+      code: 'validation_failed',
+      errors: [expect.objectContaining({ field: 'price', code: 'required' })],
     })
   })
 

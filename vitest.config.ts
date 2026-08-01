@@ -10,6 +10,17 @@ export default defineConfig({
     },
   },
   test: {
+    coverage: {
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/mocks/**',
+        'src/shared/api/generated/**',
+        'src/test/**',
+      ],
+      include: ['src/**/*.{ts,tsx}'],
+      provider: 'v8',
+      reporter: ['text', 'html'],
+    },
     environment: 'jsdom',
     execArgv: ['--no-experimental-webstorage'],
     setupFiles: './src/test/setup.ts',

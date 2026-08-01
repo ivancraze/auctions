@@ -19,7 +19,10 @@ export function createBetSchema({ min, max, step }: BetConstraints) {
   return z
     .object({
       price: z
-        .number({ invalid_type_error: 'Введите цену ставки.' })
+        .number({
+          invalid_type_error: 'Введите цену ставки.',
+          required_error: 'Введите цену ставки.',
+        })
         .finite('Введите корректную цену.')
         .positive('Цена должна быть больше нуля.'),
     })
