@@ -81,23 +81,42 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
             {auction.hasOwnBet ? 'Есть ваша ставка' : 'Вашей ставки пока нет'}
           </FieldText>
         </div>
-        {auction.action.disabled || !auction.uuid ? (
-          <Button disabled type="button" variant="disabled">
-            {auction.action.label}
-          </Button>
-        ) : (
-          <Link
-            className={buttonClassName('primary')}
-            params={{ auctionUuid: auction.uuid }}
-            search={(current) => ({
-              ...current,
-              page: current.page ?? 1,
-            })}
-            to={auction.action.to}
-          >
-            {auction.action.label}
-          </Link>
-        )}
+        <div className={styles.actions}>
+          {auction.uuid ? (
+            <Link
+              className={buttonClassName('secondary')}
+              params={{ auctionUuid: auction.uuid }}
+              search={(current) => ({
+                ...current,
+                page: current.page ?? 1,
+              })}
+              to="/auctions/$auctionUuid"
+            >
+              Открыть аукцион
+            </Link>
+          ) : (
+            <Button disabled type="button" variant="disabled">
+              Аукцион недоступен
+            </Button>
+          )}
+          {auction.action.disabled || !auction.uuid ? (
+            <Button disabled type="button" variant="disabled">
+              {auction.action.label}
+            </Button>
+          ) : (
+            <Link
+              className={buttonClassName('primary')}
+              params={{ auctionUuid: auction.uuid }}
+              search={(current) => ({
+                ...current,
+                page: current.page ?? 1,
+              })}
+              to={auction.action.to}
+            >
+              {auction.action.label}
+            </Link>
+          )}
+        </div>
       </footer>
     </article>
   )

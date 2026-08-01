@@ -70,11 +70,23 @@ a.route:hover {
   background: #fafbfd;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 @media (max-width: 640px) {
   .heading,
   .footer {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .actions {
+    display: grid;
+    justify-content: stretch;
   }
 
   .grid {
