@@ -3,6 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { mapAuctionCard } from './mapAuctionCard'
 
 describe('mapAuctionCard', () => {
+  /**
+   * Проверяет формирование доступного действия установки ставки без привязки
+   * ViewModel к маршрутам приложения.
+   */
   it('creates a bet action for an available auction without a user bet', () => {
     const result = mapAuctionCard({
       main: {
@@ -24,11 +28,37 @@ describe('mapAuctionCard', () => {
       action: {
         label: 'Сделать ставку',
         disabled: false,
-        to: '/auctions/$auctionUuid/bet',
+        kind: 'set-bet',
       },
     })
   })
 
+  /**
+   * Проверяет формирование действия просмотра ставок, когда новая ставка
+   * недоступна, но у пользователя уже есть собственная ставка.
+   */
+  it('creates a view-bets action for an auction with an existing user bet', () => {
+    const result = mapAuctionCard({
+      main: {
+        order_uid: 'auction-uuid',
+      },
+      trading: {
+        can_set_bet: false,
+        your: { bet: true },
+      },
+    })
+
+    expect(result.action).toEqual({
+      label: 'Смотреть ставки',
+      disabled: false,
+      kind: 'view-bets',
+    })
+  })
+
+  /**
+   * Проверяет безопасные значения ViewModel для неполного DTO и отсутствие
+   * навигационной цели у недоступного действия.
+   */
   it('uses safe fallback values for a partial list DTO', () => {
     const result = mapAuctionCard({})
 
@@ -39,5 +69,7 @@ describe('mapAuctionCard', () => {
       currentPrice: 'Не указано',
       action: { label: 'Недоступно', disabled: true },
     })
+    expect(result.action).not.toHaveProperty('kind')
+    expect(result.action).not.toHaveProperty('to')
   })
 })

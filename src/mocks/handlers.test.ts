@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { auctionApi } from '@/entities/auction'
-import { ApiError } from '@/shared/api/client'
+import { ApiError } from '@/shared/api'
 
 const availableAuctionUuid = '550e8400-e29b-41d4-a716-446655440001'
 const auctionWithCanceledBetUuid = '550e8400-e29b-41d4-a716-446655440002'

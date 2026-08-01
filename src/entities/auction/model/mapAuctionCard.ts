@@ -44,8 +44,6 @@ const userStatusLabels = {
   Unknown: 'Статус неизвестен',
 } as const
 
-type ActionTarget = '/auctions/$auctionUuid/bet' | '/auctions/$auctionUuid/bets'
-
 export interface AuctionCardViewModel {
   uuid: string | null
   cargoNumber: string
@@ -64,7 +62,11 @@ export interface AuctionCardViewModel {
   hasOwnBet: boolean
   action:
     | { label: string; disabled: true }
-    | { label: string; disabled: false; to: ActionTarget }
+    | {
+        label: string
+        disabled: false
+        kind: 'set-bet' | 'view-bets'
+      }
 }
 
 function formatDate(value: string | undefined) {
@@ -86,14 +88,14 @@ function getAction(
     return {
       label: hasOwnBet ? 'Изменить ставку' : 'Сделать ставку',
       disabled: false,
-      to: '/auctions/$auctionUuid/bet',
+      kind: 'set-bet',
     }
   }
   if (hasOwnBet) {
     return {
       label: 'Смотреть ставки',
       disabled: false,
-      to: '/auctions/$auctionUuid/bets',
+      kind: 'view-bets',
     }
   }
   return { label: 'Ставки недоступны', disabled: true }

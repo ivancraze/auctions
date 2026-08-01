@@ -17,6 +17,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "orval.config.ts",
+    "steiger.config.ts",
     "eslint.config.js"
   ]
 }

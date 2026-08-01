@@ -8,7 +8,7 @@ import {
   type AuctionSearchInput,
   auctionSearchSchema,
 } from '../model/searchSchema'
-import { mockCities } from '@/shared/config/cities'
+import { mockCities } from '@/shared/config'
 import { Button, FormField } from '@/shared/ui'
 
 import styles from './AuctionFilters.module.scss'

@@ -3,7 +3,7 @@ import { Link, useParams } from '@tanstack/react-router'
 
 import { AuctionDetailsSkeleton } from './AuctionDetailsSkeleton'
 import { auctionQueries, mapAuctionDetails } from '@/entities/auction'
-import { ApiError } from '@/shared/api/client'
+import { ApiError } from '@/shared/api'
 import {
   Badge,
   BadgeGroup,

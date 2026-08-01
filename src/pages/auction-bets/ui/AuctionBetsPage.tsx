@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 
 import { auctionQueries, mapBets } from '@/entities/auction'
-import { ApiError } from '@/shared/api/client'
+import { ApiError } from '@/shared/api'
 import {
   Badge,
   Breadcrumbs,

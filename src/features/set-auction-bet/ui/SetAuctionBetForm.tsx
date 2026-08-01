@@ -9,7 +9,7 @@ import {
   type AuctionDetails,
   auctionKeys,
 } from '@/entities/auction'
-import { ApiError } from '@/shared/api/client'
+import { ApiError } from '@/shared/api'
 import { Button, FormFieldGroup, useToastStore } from '@/shared/ui'
 
 import styles from './SetAuctionBetForm.module.scss'

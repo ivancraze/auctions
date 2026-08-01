@@ -8,11 +8,11 @@ import {
 import { RootLayout } from '../layout/RootLayout'
 import { auctionSearchSchema } from '@/features/filter-auctions'
 import { betsSearchSchema } from '@/features/view-auction-bets'
-import { AuctionBetPage } from '@/pages/auction-bet/ui/AuctionBetPage'
-import { AuctionBetsPage } from '@/pages/auction-bets/ui/AuctionBetsPage'
-import { AuctionDetailsPage } from '@/pages/auction-details/ui/AuctionDetailsPage'
-import { AuctionsListPage } from '@/pages/auctions-list/ui/AuctionsListPage'
-import { NotFoundPage } from '@/pages/not-found/ui/NotFoundPage'
+import { AuctionBetPage } from '@/pages/auction-bet'
+import { AuctionBetsPage } from '@/pages/auction-bets'
+import { AuctionDetailsPage } from '@/pages/auction-details'
+import { AuctionsListPage } from '@/pages/auctions-list'
+import { NotFoundPage } from '@/pages/not-found'
 
 const rootRoute = createRootRoute({
   component: RootLayout,

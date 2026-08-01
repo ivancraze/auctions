@@ -1,0 +1,1 @@
+export { mockCities } from './cities'

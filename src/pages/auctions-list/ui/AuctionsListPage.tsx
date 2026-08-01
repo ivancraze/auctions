@@ -3,7 +3,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 
 import {
@@ -18,9 +18,10 @@ import {
   buildAuctionListRequest,
   defaultAuctionSearch,
 } from '@/features/filter-auctions'
-import { ApiError } from '@/shared/api/client'
+import { ApiError } from '@/shared/api'
 import {
   Button,
+  buttonClassName,
   Eyebrow,
   PageHeading,
   PageSubtitle,
@@ -195,8 +196,56 @@ export function AuctionsListPage() {
               <div className={styles.list}>
                 {items.map((item, index) => {
                   const viewModel = mapAuctionCard(item)
+                  const auctionUuid = viewModel.uuid
+                  const actions =
+                    auctionUuid === null ? (
+                      <>
+                        <Button disabled type="button" variant="disabled">
+                          Аукцион недоступен
+                        </Button>
+                        <Button disabled type="button" variant="disabled">
+                          {viewModel.action.label}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          className={buttonClassName('secondary')}
+                          params={{ auctionUuid }}
+                          search={(current) => ({
+                            ...current,
+                            page: current.page ?? 1,
+                          })}
+                          to="/auctions/$auctionUuid"
+                        >
+                          Открыть аукцион
+                        </Link>
+                        {viewModel.action.disabled ? (
+                          <Button disabled type="button" variant="disabled">
+                            {viewModel.action.label}
+                          </Button>
+                        ) : (
+                          <Link
+                            className={buttonClassName('primary')}
+                            params={{ auctionUuid }}
+                            search={(current) => ({
+                              ...current,
+                              page: current.page ?? 1,
+                            })}
+                            to={
+                              viewModel.action.kind === 'set-bet'
+                                ? '/auctions/$auctionUuid/bet'
+                                : '/auctions/$auctionUuid/bets'
+                            }
+                          >
+                            {viewModel.action.label}
+                          </Link>
+                        )}
+                      </>
+                    )
                   return (
                     <AuctionCard
+                      actions={actions}
                       auction={viewModel}
                       key={
                         viewModel.uuid ?? `${viewModel.cargoNumber}-${index}`

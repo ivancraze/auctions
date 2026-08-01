@@ -5,7 +5,7 @@ import {
   auctionDetailsResponseSchema,
   auctionListResponseSchema,
   betListResponseSchema,
-} from '@/shared/api/responseSchemas'
+} from '@/shared/api'
 
 describe('auction fixtures', () => {
   it('covers all auction, type and user status enum values', () => {

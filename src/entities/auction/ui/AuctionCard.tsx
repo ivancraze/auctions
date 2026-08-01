@@ -1,22 +1,17 @@
-import { Link } from '@tanstack/react-router'
+import type { ReactNode } from 'react'
 
 import type { AuctionCardViewModel } from '../model/mapAuctionCard'
-import {
-  Badge,
-  BadgeGroup,
-  Button,
-  buttonClassName,
-  FieldText,
-} from '@/shared/ui'
+import { Badge, BadgeGroup, FieldText } from '@/shared/ui'
 
 import styles from './AuctionCard.module.scss'
 
 interface AuctionCardProps {
+  actions: ReactNode
   auction: AuctionCardViewModel
   onIntent: (auctionUuid: string) => void
 }
 
-export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
+export function AuctionCard({ actions, auction, onIntent }: AuctionCardProps) {
   const handleIntent = () => {
     if (auction.uuid) onIntent(auction.uuid)
   }
@@ -30,23 +25,7 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
       <div className={styles.heading}>
         <div>
           <p className={styles.number}>Заявка № {auction.cargoNumber}</p>
-          <h2 className={styles.route}>
-            {auction.uuid ? (
-              <Link
-                className={styles.routeLink}
-                search={(current) => ({
-                  ...current,
-                  page: current.page ?? 1,
-                })}
-                to="/auctions/$auctionUuid"
-                params={{ auctionUuid: auction.uuid }}
-              >
-                {auction.route}
-              </Link>
-            ) : (
-              auction.route
-            )}
-          </h2>
+          <h2 className={styles.route}>{auction.route}</h2>
         </div>
         <BadgeGroup>
           <Badge tone={auction.statusTone}>{auction.status}</Badge>
@@ -83,42 +62,7 @@ export function AuctionCard({ auction, onIntent }: AuctionCardProps) {
             {auction.hasOwnBet ? 'Есть ваша ставка' : 'Вашей ставки пока нет'}
           </FieldText>
         </div>
-        <div className={styles.actions}>
-          {auction.uuid ? (
-            <Link
-              className={buttonClassName('secondary')}
-              params={{ auctionUuid: auction.uuid }}
-              search={(current) => ({
-                ...current,
-                page: current.page ?? 1,
-              })}
-              to="/auctions/$auctionUuid"
-            >
-              Открыть аукцион
-            </Link>
-          ) : (
-            <Button disabled type="button" variant="disabled">
-              Аукцион недоступен
-            </Button>
-          )}
-          {auction.action.disabled || !auction.uuid ? (
-            <Button disabled type="button" variant="disabled">
-              {auction.action.label}
-            </Button>
-          ) : (
-            <Link
-              className={buttonClassName('primary')}
-              params={{ auctionUuid: auction.uuid }}
-              search={(current) => ({
-                ...current,
-                page: current.page ?? 1,
-              })}
-              to={auction.action.to}
-            >
-              {auction.action.label}
-            </Link>
-          )}
-        </div>
+        <div className={styles.actions}>{actions}</div>
       </footer>
     </article>
   )

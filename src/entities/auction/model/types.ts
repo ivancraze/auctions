@@ -1,4 +1,4 @@
-import type { components } from '@/shared/api/generated/schema'
+import type { components } from '@/shared/api'
 
 export type AuctionListRequest = components['schemas']['AuctionListRequest']
 export type AuctionListItem = components['schemas']['AuctionListItem']
