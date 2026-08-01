@@ -4,7 +4,7 @@ SPA для просмотра грузовых аукционов, истори�
 
 ## Запуск
 
-Требования: Node.js 20+ и npm.
+Требования: Node.js 26.5+ и npm 11.17+. Версии зафиксированы в `.nvmrc`, `.node-version` и `package.json`.
 
 ```bash
 npm install
@@ -21,7 +21,7 @@ npm run typecheck  # проверка TypeScript
 npm run lint       # ESLint
 npm run format     # форматирование Prettier
 npm run build      # production-сборка
-npm run generate:api # повторная генерация типов из OpenAPI
+npm run generate:api # повторная генерация TypeScript-типов и Zod-схем
 ```
 
 ## Реализовано

@@ -31,7 +31,7 @@ AI использовался как вспомогательный инстру
 ## Что проверялось особенно внимательно
 
 - nullable-поля, enum-значения и формы ошибок OpenAPI;
-- runtime-проверка как успешных ответов, так и problem responses;
+- генерация и runtime-проверка как успешных ответов, так и problem responses;
 - ограничения `can_set_bet`, `hide_bets_history`, `hide_points_address_and_contacts` и `no_view_cargo_price`;
 - соответствие цены ограничениям `min`, `max` и `step`;
 - обновление MSW-store и инвалидация всех связанных query после ставки;

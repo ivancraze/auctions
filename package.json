@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=26.5.0"
+  },
+  "packageManager": "npm@11.17.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -10,7 +14,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate:api": "openapi-typescript openapi.auctions.v0.json -o src/shared/api/generated/schema.ts && prettier --write src/shared/api/generated/schema.ts",
+    "generate:api": "npm run generate:api:types && npm run generate:api:zod",
+    "generate:api:types": "openapi-typescript openapi.auctions.v0.json -o src/shared/api/generated/schema.ts && prettier --write src/shared/api/generated/schema.ts",
+    "generate:api:zod": "orval --config orval.config.ts && prettier --write src/shared/api/generated/zod.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -38,6 +44,7 @@
     "jsdom": "^29.1.1",
     "msw": "^2.15.0",
     "openapi-typescript": "^7.13.0",
+    "orval": "^8.23.0",
     "prettier": "^3.9.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.65.0",
