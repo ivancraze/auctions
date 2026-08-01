@@ -15,12 +15,11 @@ describe('auction MSW handlers', () => {
     })
 
     expect(response.data).toHaveLength(1)
-    expect(response.data?.[0]?.main?.cargo_num).toBe('00000001001')
-    expect(response.meta).toMatchObject({
-      current_page: 1,
-      per_page: 1,
-      total: 1,
-    })
+    expect(response.data?.[0]?.route?.load?.city).toBe('Самара')
+    expect(response.meta?.current_page).toBe(1)
+    expect(response.meta?.per_page).toBe(1)
+    expect(response.meta?.total).toBeGreaterThan(1)
+    expect(response.meta?.last_page).toBe(response.meta?.total)
   })
 
   it('returns canceled bets only when all=true', async () => {

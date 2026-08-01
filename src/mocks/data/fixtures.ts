@@ -31,9 +31,23 @@ interface AuctionSeed {
   hideHistory?: boolean
   hideContacts?: boolean
   noViewCargoPrice?: boolean
+  allowCounterBets?: boolean
+  isAccredited?: boolean
+  betCount?: number
+  priceMin?: number | null
+  priceMax?: number | null
+  priceStep?: number | null
+  startTime?: string
+  stopTime?: string
+  bidMeasurementType?: 'PerRoute' | 'PerKm' | 'Unknown'
+  hidePlaces?: boolean
+  sendDealBeforeLoad?: boolean
+  weight?: number
+  volume?: number
+  truckCount?: number
 }
 
-const seeds: AuctionSeed[] = [
+const baseSeeds: AuctionSeed[] = [
   {
     uuid: '550e8400-e29b-41d4-a716-446655440001',
     id: 1001,
@@ -134,6 +148,116 @@ const seeds: AuctionSeed[] = [
   },
 ]
 
+const auctionTypes: AuctionType[] = [
+  'Request',
+  'Up',
+  'Down',
+  'FixPrice',
+  'Unknown',
+]
+
+const auctionStatuses: AuctionStatus[] = [
+  'Planning',
+  'Auction',
+  'Auction',
+  'Auction',
+  'DeterminateWinner',
+  'WaitDeal',
+  'InProgress',
+  'Finished',
+  'Stopped',
+  'Canceled',
+  'Unknown',
+]
+
+const userStatuses: UserStatus[] = [
+  'NotParticipating',
+  'Leading',
+  'Losing',
+  'Winner',
+  'Confirmed',
+  'Unknown',
+]
+
+const cities = [
+  { name: 'Самара', gcId: 63 },
+  { name: 'Москва', gcId: 77 },
+  { name: 'Казань', gcId: 16 },
+  { name: 'Пермь', gcId: 59 },
+  { name: 'Уфа', gcId: 2 },
+  { name: 'Екатеринбург', gcId: 66 },
+  { name: 'Санкт-Петербург', gcId: 78 },
+  { name: 'Псков', gcId: 60 },
+  { name: 'Минск', gcId: 1001 },
+] as const
+
+const bodyTypes = [
+  'тентованный',
+  'рефрижератор',
+  'фургон',
+  'контейнеровоз',
+  'бортовой',
+  'цистерна',
+] as const
+
+function dateAfterDays(dayOffset: number, hour: number) {
+  return new Date(Date.UTC(2026, 7, 1 + dayOffset, hour)).toISOString()
+}
+
+const generatedSeeds: AuctionSeed[] = Array.from({ length: 30 }, (_, index) => {
+  const status = auctionStatuses[index % auctionStatuses.length]!
+  const type = auctionTypes[index % auctionTypes.length]!
+  const userStatus = userStatuses[index % userStatuses.length]!
+  const origin = cities[index % cities.length]!
+  const destination = cities[(index + 2 + (index % 3)) % cities.length]!
+  const hasBet = !['NotParticipating', 'Unknown'].includes(userStatus)
+  const canSetBet =
+    status === 'Auction' && type !== 'Request' && type !== 'Unknown'
+  const priceStep = [500, 1000, 2500, 5000][index % 4]!
+
+  return {
+    uuid: `550e8400-e29b-41d4-a716-${String(446655441001 + index)}`,
+    id: 2001 + index,
+    cargoNum: String(2001 + index).padStart(11, '0'),
+    type,
+    status,
+    userStatus,
+    origin: origin.name,
+    originGcId: origin.gcId,
+    destination: destination.name,
+    destinationGcId: destination.gcId,
+    loadDate: dateAfterDays(index, 6 + (index % 6)),
+    unloadDate: dateAfterDays(index + 1 + (index % 3), 14 + (index % 8)),
+    currentPrice: 50000 + index * 5000,
+    pricePerKm: 75 + index * 4.35,
+    bodyType: bodyTypes[index % bodyTypes.length]!,
+    canSetBet,
+    hasBet,
+    isFavorite: index % 4 === 0,
+    isInternational: index % 8 === 0,
+    hideHistory: index % 7 === 0,
+    hideContacts: index % 5 === 0,
+    noViewCargoPrice: index % 6 === 0,
+    allowCounterBets: index % 3 !== 0,
+    isAccredited: index % 9 !== 0,
+    betCount: index % 5,
+    priceMin: index % 10 === 0 ? null : index % 2 === 0 ? 10000 : 25000,
+    priceMax: index % 9 === 0 ? null : 300000,
+    priceStep: index % 11 === 0 ? null : priceStep,
+    startTime: dateAfterDays(index - 2, 9),
+    stopTime: dateAfterDays(index - 1, 18),
+    bidMeasurementType:
+      index % 7 === 0 ? 'Unknown' : index % 2 === 0 ? 'PerRoute' : 'PerKm',
+    hidePlaces: index % 8 === 0,
+    sendDealBeforeLoad: index % 4 === 0,
+    weight: 5 + (index % 6) * 5,
+    volume: 20 + (index % 7) * 12,
+    truckCount: 1 + (index % 3),
+  }
+})
+
+const seeds = [...baseSeeds, ...generatedSeeds]
+
 function createListItem(seed: AuctionSeed): AuctionListItem {
   return {
     main: {
@@ -142,7 +266,7 @@ function createListItem(seed: AuctionSeed): AuctionListItem {
       cargo_date: seed.loadDate,
       auc_type: seed.type,
       order_uid: seed.uuid,
-      created_at: '2026-07-30T12:00:00+04:00',
+      created_at: seed.startTime ?? '2026-07-30T12:00:00+04:00',
       priority_sort: 0,
       is_assembly: false,
       price_per_km: seed.pricePerKm,
@@ -176,10 +300,10 @@ function createListItem(seed: AuctionSeed): AuctionListItem {
         seed.bodyType === 'рефрижератор'
           ? 'Замороженные продукты'
           : 'Строительные материалы',
-      weight: 20,
-      volume: 82,
+      weight: seed.weight ?? 20,
+      volume: seed.volume ?? 82,
       body_type: seed.bodyType,
-      truck_count: 1,
+      truck_count: seed.truckCount ?? 1,
       is_cargo: true,
       is_international: seed.isInternational ?? false,
       containered: false,
@@ -197,8 +321,8 @@ function createListItem(seed: AuctionSeed): AuctionListItem {
       docs: { tir: false, cmr: false, t1: false, med: false },
       car: {
         type: 'Тягач',
-        weight: 20,
-        volume: 82,
+        weight: seed.weight ?? 20,
+        volume: seed.volume ?? 82,
         width: 2.45,
         length: 13.6,
         height: 2.7,
@@ -207,17 +331,17 @@ function createListItem(seed: AuctionSeed): AuctionListItem {
     trading: {
       status: seed.status,
       status_mobile: seed.userStatus,
-      start_time: '2026-08-01T09:00:00+04:00',
-      stop_time: '2026-08-02T18:00:00+04:00',
-      bid_measurement_type: 'PerRoute',
+      start_time: seed.startTime ?? '2026-08-01T09:00:00+04:00',
+      stop_time: seed.stopTime ?? '2026-08-02T18:00:00+04:00',
+      bid_measurement_type: seed.bidMeasurementType ?? 'PerRoute',
       can_set_bet: seed.canSetBet,
-      allow_counter_bets: true,
+      allow_counter_bets: seed.allowCounterBets ?? true,
       hide_points_address_and_contacts: seed.hideContacts ?? false,
       direction: seed.type,
       comment: '',
       is_bidder: seed.hasBet ?? false,
       is_available: seed.canSetBet,
-      is_accredited: true,
+      is_accredited: seed.isAccredited ?? true,
       is_favorite: seed.isFavorite ?? false,
       price: {
         start: seed.currentPrice + 10000,
@@ -242,6 +366,15 @@ function createListItem(seed: AuctionSeed): AuctionListItem {
 }
 
 function createDetails(seed: AuctionSeed): AuctionDetails {
+  const step = seed.priceStep === undefined ? 1000 : (seed.priceStep ?? 0)
+  const min = seed.priceMin === undefined ? 10000 : seed.priceMin
+  const max = seed.priceMax === undefined ? 300000 : seed.priceMax
+  const nextPrice = seed.currentPrice + (seed.type === 'Up' ? step : -step)
+  const availablePrice = Math.min(
+    max ?? Infinity,
+    Math.max(min ?? -Infinity, nextPrice),
+  )
+
   return {
     main: {
       id: seed.id,
@@ -249,7 +382,7 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
       cargo_date: seed.loadDate,
       order_uid: seed.uuid,
       auc_type: seed.type,
-      created_at: '2026-07-30T12:00:00+04:00',
+      created_at: seed.startTime ?? '2026-07-30T12:00:00+04:00',
     },
     organizer: {
       subscriber_id: 98,
@@ -274,7 +407,7 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
       currency: 643,
       is_international: seed.isInternational ?? false,
       distance: 1070,
-      truck_count: 1,
+      truck_count: seed.truckCount ?? 1,
       body_type: seed.bodyType,
       temp_from: seed.bodyType === 'рефрижератор' ? -18 : null,
       temp_to: seed.bodyType === 'рефрижератор' ? -15 : null,
@@ -292,8 +425,8 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
       docs: { tir: false, cmr: false, t1: false, med: false },
       car: {
         type: 'Тягач',
-        weight: 20,
-        volume: 82,
+        weight: seed.weight ?? 20,
+        volume: seed.volume ?? 82,
         width: 2.45,
         length: 13.6,
         height: 2.7,
@@ -302,13 +435,13 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
     trading: {
       status: seed.status,
       status_mobile: seed.userStatus,
-      start_time: '2026-08-01T09:00:00+04:00',
-      stop_time: '2026-08-02T18:00:00+04:00',
-      bid_measurement_type: 'PerRoute',
+      start_time: seed.startTime ?? '2026-08-01T09:00:00+04:00',
+      stop_time: seed.stopTime ?? '2026-08-02T18:00:00+04:00',
+      bid_measurement_type: seed.bidMeasurementType ?? 'PerRoute',
       can_set_bet: seed.canSetBet,
-      allow_counter_bets: true,
+      allow_counter_bets: seed.allowCounterBets ?? true,
       hide_bets_history: seed.hideHistory ?? false,
-      hide_places: false,
+      hide_places: seed.hidePlaces ?? false,
       no_view_cargo_price: seed.noViewCargoPrice ?? false,
       hide_points_address_and_contacts: seed.hideContacts ?? false,
       is_bidder: seed.hasBet ?? false,
@@ -316,27 +449,36 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
       is_last_bet_with_vat: seed.hasBet ?? false,
       red_bet_with_vat: false,
       red_bet_no_vat: false,
-      send_deal_before_load: false,
+      send_deal_before_load: seed.sendDealBeforeLoad ?? false,
       chat_id: null,
       price: {
         start: seed.currentPrice + 10000,
         start_no_vat: (seed.currentPrice + 10000) / 1.2,
         current: seed.currentPrice,
         current_no_vat: seed.currentPrice / 1.2,
-        available:
-          seed.type === 'Up'
-            ? seed.currentPrice + 1000
-            : seed.currentPrice - 1000,
-        available_no_vat:
-          (seed.type === 'Up'
-            ? seed.currentPrice + 1000
-            : seed.currentPrice - 1000) / 1.2,
-        min: 10000,
-        min_no_vat: 10000 / 1.2,
-        max: 300000,
-        max_no_vat: 250000,
-        step: 1000,
-        step_no_vat: 1000 / 1.2,
+        available: availablePrice,
+        available_no_vat: availablePrice / 1.2,
+        min: seed.priceMin === undefined ? 10000 : seed.priceMin,
+        min_no_vat:
+          seed.priceMin === undefined
+            ? 10000 / 1.2
+            : seed.priceMin === null
+              ? null
+              : seed.priceMin / 1.2,
+        max: seed.priceMax === undefined ? 300000 : seed.priceMax,
+        max_no_vat:
+          seed.priceMax === undefined
+            ? 250000
+            : seed.priceMax === null
+              ? null
+              : seed.priceMax / 1.2,
+        step: seed.priceStep === undefined ? 1000 : seed.priceStep,
+        step_no_vat:
+          seed.priceStep === undefined
+            ? 1000 / 1.2
+            : seed.priceStep === null
+              ? null
+              : seed.priceStep / 1.2,
         price_per_km: seed.pricePerKm,
       },
       your: {
@@ -383,8 +525,8 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
         cargo: {
           name: 'Основной груз',
           package_name: 'Паллеты',
-          weight: '20',
-          volume: '82',
+          weight: String(seed.weight ?? 20),
+          volume: String(seed.volume ?? 82),
           length: '13.6',
           width: '2.45',
           height: '2.7',
@@ -412,8 +554,8 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
         cargo: {
           name: 'Основной груз',
           package_name: 'Паллеты',
-          weight: '20',
-          volume: '82',
+          weight: String(seed.weight ?? 20),
+          volume: String(seed.volume ?? 82),
           length: '13.6',
           width: '2.45',
           height: '2.7',
@@ -445,29 +587,45 @@ function createDetails(seed: AuctionSeed): AuctionDetails {
   }
 }
 
-function createBet(seed: AuctionSeed, id: number, canceled = false): BetItem {
+const carriers = [
+  { id: 14, inn: '6311223344', name: 'ООО ТрансЛайн' },
+  { id: 25, inn: '1650123456', name: 'ООО Волга Карго' },
+  { id: 36, inn: '6671987654', name: 'ООО Урал Транс' },
+  { id: 47, inn: '7812456789', name: 'ООО Север Логистик' },
+] as const
+
+function createBet(
+  seed: AuctionSeed,
+  id: number,
+  canceled = false,
+  variant = 0,
+): BetItem {
+  const carrier = carriers[variant % carriers.length]!
+  const price =
+    seed.currentPrice + (seed.type === 'Up' ? -variant : variant) * 1000
+
   return {
     id,
-    created_at: '2026-08-01T12:00:00+04:00',
+    created_at: seed.startTime ?? '2026-08-01T12:00:00+04:00',
     auction_id: seed.id,
-    subscriber_id: 13,
-    contact_name: 'Иван Иванов',
-    contact_phone: '+7 900 300-40-50',
-    price_with_vat: seed.currentPrice,
-    price_no_vat: seed.currentPrice / 1.2,
-    organization_id: 14,
-    organization_inn: '6311223344',
-    organization_name: 'ООО ТрансЛайн',
+    subscriber_id: 13 + variant,
+    contact_name: `Представитель ${variant + 1}`,
+    contact_phone: `+7 900 300-40-${String(50 + variant).padStart(2, '0')}`,
+    price_with_vat: price,
+    price_no_vat: price / 1.2,
+    organization_id: carrier.id,
+    organization_inn: carrier.inn,
+    organization_name: carrier.name,
     transporter_comment: null,
     is_rejected: canceled,
-    is_counter: false,
-    place: canceled ? null : 1,
-    is_win: seed.userStatus === 'Winner',
-    run_number: 0,
+    is_counter: variant % 3 === 2,
+    place: canceled ? null : variant + 1,
+    is_win: seed.userStatus === 'Winner' && variant === 0,
+    run_number: variant,
     cancel_reason: canceled ? 'Ставка отозвана перевозчиком' : '',
     price_info: {
-      price_with_vat: seed.currentPrice,
-      price_no_vat: seed.currentPrice / 1.2,
+      price_with_vat: price,
+      price_no_vat: price / 1.2,
       payment_type: 'Безналичная с НДС',
       vat_rate: '20',
     },
@@ -483,15 +641,24 @@ export function createInitialMockData() {
     bets: Object.fromEntries(
       seeds.map((seed, index) => [
         seed.uuid,
-        seed.hasBet
-          ? [
-              createBet(seed, index * 10 + 1),
-              createBet(seed, index * 10 + 2, true),
-            ]
-          : [],
+        seed.betCount !== undefined
+          ? Array.from({ length: seed.betCount }, (_, betIndex) =>
+              createBet(
+                seed,
+                index * 100 + betIndex + 1,
+                seed.betCount! > 2 && betIndex === seed.betCount! - 1,
+                betIndex,
+              ),
+            )
+          : seed.hasBet
+            ? [
+                createBet(seed, index * 10 + 1),
+                createBet(seed, index * 10 + 2, true),
+              ]
+            : [],
       ]),
     ),
-    nextBetId: 100,
+    nextBetId: 10000,
   } satisfies {
     auctions: AuctionListItem[]
     details: Record<string, AuctionDetails>

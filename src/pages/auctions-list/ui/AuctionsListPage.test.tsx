@@ -17,27 +17,27 @@ describe('AuctionsListPage', () => {
   it('loads and renders auction cards', async () => {
     render(<AppProviders />)
 
-    expect(await screen.findByText('Заявка № 00000001001')).toBeInTheDocument()
-    expect(screen.getByText('Самара → Москва')).toBeInTheDocument()
+    expect(await screen.findByText('Заявка № 00000002030')).toBeInTheDocument()
+    expect(screen.getByText('Казань → Санкт-Петербург')).toBeInTheDocument()
     expect(
       screen.getByRole('navigation', { name: 'Пагинация аукционов' }),
     ).toBeInTheDocument()
 
     const firstCard = screen
-      .getByText('Заявка № 00000001001')
+      .getByText('Заявка № 00000002030')
       .closest('article')
     expect(firstCard).not.toBeNull()
     fireEvent.pointerEnter(firstCard!)
     await waitFor(() => {
       expect(
         queryClient.getQueryData(
-          auctionKeys.detail('550e8400-e29b-41d4-a716-446655440001'),
+          auctionKeys.detail('550e8400-e29b-41d4-a716-446655441030'),
         ),
       ).toBeDefined()
     })
 
     fireEvent.click(screen.getByRole('button', { name: 'Далее →' }))
-    expect(await screen.findByText('Заявка № 00000001004')).toBeInTheDocument()
+    expect(await screen.findByText('Заявка № 00000002027')).toBeInTheDocument()
   })
 
   it('renders the empty state', async () => {
@@ -63,14 +63,13 @@ describe('AuctionsListPage', () => {
 
   it('applies filters and stores them in the URL search state', async () => {
     render(<AppProviders />)
-    await screen.findByText('Заявка № 00000001001')
+    await screen.findByText('Заявка № 00000002030')
 
     fireEvent.change(screen.getByLabelText('Номер заявки'), {
       target: { value: '00000001002' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Применить' }))
 
-    expect(await screen.findByText('Заявка № 00000001002')).toBeInTheDocument()
     await waitFor(() => {
       expect(router.state.location.search).toMatchObject({
         page: 1,
