@@ -8,6 +8,7 @@ import {
 } from '@/shared/api'
 
 describe('auction fixtures', () => {
+  /** Проверяет представленность всех enum-вариантов аукциона и пользователя. */
   it('covers all auction, type and user status enum values', () => {
     const { auctions } = createInitialMockData()
 
@@ -42,6 +43,7 @@ describe('auction fixtures', () => {
     )
   })
 
+  /** Проверяет разнообразие ограничений, историй и nullable-границ цены. */
   it('contains diverse restrictions, histories and nullable price limits', () => {
     const data = createInitialMockData()
     const details = Object.values(data.details)
@@ -68,6 +70,7 @@ describe('auction fixtures', () => {
     )
   })
 
+  /** Проверяет соответствие всех fixtures сгенерированным runtime-схемам API. */
   it('keeps every generated fixture inside the runtime API contract', () => {
     const data = createInitialMockData()
 

@@ -4,9 +4,10 @@ import { auctionApi } from '@/entities/auction'
 import { ApiError } from '@/shared/api'
 
 const availableAuctionUuid = '550e8400-e29b-41d4-a716-446655440001'
-const auctionWithCanceledBetUuid = '550e8400-e29b-41d4-a716-446655440002'
+const ascendingAuctionUuid = '550e8400-e29b-41d4-a716-446655440002'
 
 describe('auction MSW handlers', () => {
+  /** Проверяет серверную фильтрацию и метаданные постраничной выдачи. */
   it('filters and paginates the auction list', async () => {
     const response = await auctionApi.list({
       load_city: 'Самара',
@@ -22,9 +23,10 @@ describe('auction MSW handlers', () => {
     expect(response.meta?.last_page).toBe(response.meta?.total)
   })
 
+  /** Проверяет включение отменённых ставок только по параметру all=true. */
   it('returns canceled bets only when all=true', async () => {
-    const active = await auctionApi.getBets(auctionWithCanceledBetUuid)
-    const all = await auctionApi.getBets(auctionWithCanceledBetUuid, {
+    const active = await auctionApi.getBets(ascendingAuctionUuid)
+    const all = await auctionApi.getBets(ascendingAuctionUuid, {
       all: true,
     })
 
@@ -33,6 +35,7 @@ describe('auction MSW handlers', () => {
     expect(all.bets.some((bet) => bet.is_rejected)).toBe(true)
   })
 
+  /** Проверяет обновление цены, статуса и истории во всём mock-store после ставки. */
   it('updates list, detail and bets after setting a bet', async () => {
     const [detailBefore, betsBefore] = await Promise.all([
       auctionApi.getByUuid(availableAuctionUuid),
@@ -82,6 +85,19 @@ describe('auction MSW handlers', () => {
     })
   })
 
+  /** Проверяет увеличение доступной цены на шаг для аукциона на повышение. */
+  it('increments the available price for an ascending auction', async () => {
+    await auctionApi.setBet(ascendingAuctionUuid, { price: 86000 })
+
+    const detail = await auctionApi.getByUuid(ascendingAuctionUuid)
+
+    expect(detail.trading.price).toMatchObject({
+      current: 86000,
+      available: 87000,
+    })
+  })
+
+  /** Проверяет контрактные 422-ответы для всех ограничений цены ставки. */
   it.each([
     [-1000, 'min_value'],
     [0, 'min_value'],
@@ -104,6 +120,7 @@ describe('auction MSW handlers', () => {
     },
   )
 
+  /** Проверяет запрет ставки по бизнес-флагу конкретного аукциона. */
   it('rejects a bet when the auction does not allow bidding', async () => {
     const result = auctionApi.setBet('550e8400-e29b-41d4-a716-446655440003', {
       price: 74000,
@@ -122,6 +139,7 @@ describe('auction MSW handlers', () => {
     })
   })
 
+  /** Проверяет обязательность цены при пустом теле POST-запроса. */
   it('returns a required validation error for an empty request body', async () => {
     const response = await fetch(
       `/api/v1/auctions/${availableAuctionUuid}/bets`,
@@ -135,6 +153,7 @@ describe('auction MSW handlers', () => {
     })
   })
 
+  /** Проверяет контрактный 404-ответ для неизвестного идентификатора. */
   it('returns a contract-shaped 404 for an unknown auction', async () => {
     const result = auctionApi.getByUuid('00000000-0000-0000-0000-000000000000')
 
