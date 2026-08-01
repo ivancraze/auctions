@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { type FormEvent, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 import {
@@ -28,6 +29,9 @@ const moneyFormatter = new Intl.NumberFormat('ru-RU', {
   currency: 'RUB',
   maximumFractionDigits: 2,
 })
+const priceInputId = 'bet-price'
+const priceLimitsId = 'bet-price-limits'
+const priceErrorId = 'bet-price-error'
 
 function formatMoney(value: number | null | undefined) {
   return value == null ? 'Не указано' : moneyFormatter.format(value)
@@ -39,6 +43,7 @@ interface BetFormProps {
 }
 
 function BetForm({ auctionUuid, details }: BetFormProps) {
+  const submitLockRef = useRef(false)
   const queryClient = useQueryClient()
   const navigate = useNavigate({ from: '/auctions/$auctionUuid/bet' })
   const showToast = useToastStore((state) => state.show)
@@ -52,7 +57,7 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<BetFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -112,11 +117,27 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
     }
   })
 
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    if (submitLockRef.current) {
+      event.preventDefault()
+      return
+    }
+
+    submitLockRef.current = true
+
+    try {
+      await submit(event)
+    } finally {
+      submitLockRef.current = false
+    }
+  }
+
   return (
     <form
+      aria-busy={isSubmitting}
       className={styles.form}
       noValidate
-      onSubmit={(event) => void submit(event)}
+      onSubmit={(event) => void handleFormSubmit(event)}
     >
       <div className={styles.summary}>
         <div>
@@ -134,25 +155,28 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
       </div>
 
       <FormFieldGroup>
-        <label htmlFor="bet-price">Цена ставки</label>
+        <label htmlFor={priceInputId}>Цена ставки</label>
         <div className={styles.priceInput}>
           <input
-            id="bet-price"
+            aria-describedby={`${priceLimitsId}${errors.price ? ` ${priceErrorId}` : ''}`}
             aria-invalid={errors.price ? 'true' : 'false'}
+            id={priceInputId}
             max={constraints?.max ?? undefined}
             min={constraints?.min ?? 0}
             step={constraints?.step ?? 'any'}
             type="number"
             {...register('price', { valueAsNumber: true })}
           />
-          <span>₽</span>
+          <span aria-hidden="true">₽</span>
         </div>
         {errors.price ? (
-          <span className={styles.error}>{errors.price.message}</span>
+          <span className={styles.error} id={priceErrorId} role="alert">
+            {errors.price.message}
+          </span>
         ) : null}
       </FormFieldGroup>
 
-      <div className={styles.limits}>
+      <div className={styles.limits} id={priceLimitsId}>
         <span>Минимум: {formatMoney(constraints?.min)}</span>
         <span>Максимум: {formatMoney(constraints?.max)}</span>
       </div>
@@ -164,8 +188,10 @@ function BetForm({ auctionUuid, details }: BetFormProps) {
       ) : null}
 
       <div className={styles.actions}>
-        <Button disabled={mutation.isPending} type="submit">
-          {mutation.isPending ? 'Отправляем…' : 'Подтвердить ставку'}
+        <Button disabled={isSubmitting || mutation.isPending} type="submit">
+          {isSubmitting || mutation.isPending
+            ? 'Отправляем…'
+            : 'Подтвердить ставку'}
         </Button>
         <Link
           className={buttonClassName('secondary')}
