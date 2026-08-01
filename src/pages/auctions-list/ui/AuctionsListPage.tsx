@@ -14,7 +14,7 @@ import {
   buildAuctionListRequest,
   defaultAuctionSearch,
 } from '@/features/filter-auctions'
-import { Eyebrow, PageHeading, PageSubtitle } from '@/shared/ui'
+import { Breadcrumbs } from '@/shared/ui'
 
 import styles from './AuctionsListPage.module.scss'
 
@@ -67,20 +67,17 @@ export function AuctionsListPage() {
 
   return (
     <section>
-      <PageHeading>
-        <div>
-          <Eyebrow>Грузовые перевозки</Eyebrow>
-          <h1>Аукционы</h1>
-          <PageSubtitle>
-            Актуальные заявки на перевозку и ваши позиции в торгах
-          </PageSubtitle>
-        </div>
+      <h1 className={styles.visuallyHidden}>Аукционы</h1>
+      <div className={styles.contextRow}>
+        <Breadcrumbs className={styles.breadcrumbs}>
+          <span aria-current="page">Аукционы</span>
+        </Breadcrumbs>
         {meta ? (
           <p className={styles.resultCount}>
             Найдено: <strong>{meta.total ?? 0}</strong>
           </p>
         ) : null}
-      </PageHeading>
+      </div>
 
       <div className={styles.layout}>
         <AuctionFilters

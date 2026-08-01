@@ -15,12 +15,17 @@
 }
 
 .header {
-  display: flex;
-  min-height: 64px;
-  align-items: center;
-  padding: 0 24px;
   color: #fff;
   background: #172033;
+}
+
+.headerInner {
+  display: flex;
+  width: min(1200px, 100%);
+  min-height: 64px;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .routeAnnouncement {
@@ -43,10 +48,14 @@
 .main {
   width: min(1200px, 100%);
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 24px;
 }
 
 @media (max-width: 640px) {
+  .headerInner {
+    padding: 0 16px;
+  }
+
   .main {
     padding: 24px 16px;
   }

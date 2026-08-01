@@ -19,6 +19,9 @@ describe('RootLayout', () => {
     ).toHaveAttribute('href', '#main-content')
     expect(screen.getByText('Открыта страница: Аукционы')).toBeInTheDocument()
     expect(document.title).toBe('Аукционы — Умная Логистика')
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Аукционы' }),
+    ).toBeInTheDocument()
 
     await act(async () => {
       await router.navigate({
@@ -33,6 +36,14 @@ describe('RootLayout', () => {
       expect(screen.getByText('Открыта страница: Аукцион')).toBeInTheDocument()
       expect(screen.getByRole('main')).toHaveFocus()
     })
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 1,
+        name: 'Самара → Москва',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
 
   /** Проверяет доступный fallback и возврат к списку для неизвестного URL. */

@@ -32,6 +32,13 @@ describe('AuctionsListPage', () => {
   it('loads and renders auction cards', async () => {
     render(<AppProviders />)
 
+    const breadcrumbs = screen.getByRole('navigation', {
+      name: 'Навигационная цепочка',
+    })
+    expect(within(breadcrumbs).getByText('Аукционы')).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
     expect(await screen.findByText('Заявка № 00000002030')).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: 'Казань → Санкт-Петербург' }),

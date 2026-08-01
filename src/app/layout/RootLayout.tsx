@@ -37,9 +37,11 @@ export function RootLayout() {
         Перейти к основному содержимому
       </a>
       <header className={styles.header}>
-        <Link className={styles.logo} search={{ page: 1 }} to="/auctions">
-          Умная Логистика
-        </Link>
+        <div className={styles.headerInner}>
+          <Link className={styles.logo} search={{ page: 1 }} to="/auctions">
+            Умная Логистика
+          </Link>
+        </div>
       </header>
       <p className={styles.routeAnnouncement} aria-atomic="true" role="status">
         Открыта страница: {routeTitle}
