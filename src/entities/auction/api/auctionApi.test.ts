@@ -8,6 +8,7 @@ afterEach(() => {
 })
 
 describe('auctionApi', () => {
+  /** Проверяет endpoint, метод и тело запроса списка по OpenAPI. */
   it('sends the list request using the OpenAPI endpoint', async () => {
     const responseBody = {
       data: [],
@@ -39,6 +40,7 @@ describe('auctionApi', () => {
     )
   })
 
+  /** Проверяет добавление query-параметра all только для boolean-значения. */
   it('adds the all query parameter only for a boolean value', async () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
@@ -54,6 +56,7 @@ describe('auctionApi', () => {
     )
   })
 
+  /** Проверяет сохранение полей контрактной ошибки валидации 422. */
   it('preserves a validation problem from a 422 response', async () => {
     const validationProblem = {
       code: 'validation_failed',
@@ -83,6 +86,28 @@ describe('auctionApi', () => {
     })
   })
 
+  /** Проверяет безопасную ошибку для невалидного тела неуспешного HTTP-ответа. */
+  it('uses a safe fallback for a malformed error response', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response('<html>Ошибка прокси</html>', {
+        status: 502,
+        statusText: 'Bad Gateway',
+      }),
+    )
+
+    const result = auctionApi.getByUuid('auction-uuid')
+
+    await expect(result).rejects.toMatchObject({
+      status: 502,
+      problem: {
+        code: 'http_error',
+        title: 'Ошибка запроса',
+        message: 'Bad Gateway',
+      },
+    })
+  })
+
+  /** Проверяет отклонение успешного HTTP-ответа, нарушающего runtime-схему. */
   it('rejects a successful response that violates the runtime schema', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ data: 'not-an-array' }), { status: 200 }),

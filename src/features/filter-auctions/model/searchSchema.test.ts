@@ -29,10 +29,13 @@ describe('auction search params', () => {
       statuses: 2,
       auc_type: 'Down',
       load_city: 'Самара',
+      unload_city: 'Москва',
       load_date_from: '2026-08-01',
       load_date_to: '2026-08-05',
       is_available: true,
+      is_bidder: false,
       current_price_from: 50000,
+      current_price_to: 150000,
     })
 
     const request = buildAuctionListRequest(search, 20)
@@ -44,11 +47,14 @@ describe('auction search params', () => {
       statuses: [2],
       auc_type: ['Down'],
       load_city: 'Самара',
+      unload_city: 'Москва',
       is_available: true,
+      is_bidder: false,
       current_price_from: 50000,
+      current_price_to: 150000,
     })
-    expect(request.load_date_from).toMatch(/^2026-08-01T/)
-    expect(request.load_date_to).toMatch(/^2026-08-05T/)
+    expect(request.load_date_from).toBe('2026-08-01T00:00:00.000Z')
+    expect(request.load_date_to).toBe('2026-08-05T23:59:59.999Z')
   })
 
   /** Проверяет поддержку всех строковых статусов пользователя из OpenAPI. */

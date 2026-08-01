@@ -55,6 +55,33 @@ describe('mapAuctionCard', () => {
     })
   })
 
+  /** Проверяет действие изменения ставки для уже участвующего пользователя. */
+  it('creates an edit-bet action when another bet is allowed', () => {
+    const result = mapAuctionCard({
+      main: { order_uid: 'auction-uuid' },
+      trading: { can_set_bet: true, your: { bet: true } },
+    })
+
+    expect(result.action).toEqual({
+      label: 'Изменить ставку',
+      disabled: false,
+      kind: 'set-bet',
+    })
+  })
+
+  /** Проверяет недоступное действие при запрете ставок и отсутствии участия. */
+  it('disables betting when the auction rejects new bets', () => {
+    const result = mapAuctionCard({
+      main: { order_uid: 'auction-uuid' },
+      trading: { can_set_bet: false, your: { bet: false } },
+    })
+
+    expect(result.action).toEqual({
+      label: 'Ставки недоступны',
+      disabled: true,
+    })
+  })
+
   /**
    * Проверяет безопасные значения ViewModel для неполного DTO и отсутствие
    * навигационной цели у недоступного действия.
